@@ -1,0 +1,3 @@
+[submodule "dataclasses"]
+	path = dataclasses
+	url = https://github.com/ericvsmith/dataclasses.git
