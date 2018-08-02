@@ -1,5 +1,5 @@
 import dataclasses
-from .Reducer import Reducer
+from ..Reducer import Reducer
 
 __all__ = 'init_reducers',
 

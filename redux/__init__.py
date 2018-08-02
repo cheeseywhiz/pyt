@@ -1,11 +1,6 @@
-from .CombineReducers import CombineReducers
-from .CombineReducersStack import CombineReducersStack
-from .init_reducers import init_reducers
-from .MergeReducers import MergeReducers
+from .reducer_utils import *
+from .reducer_utils import __all__ as _reducer_utils_all
 from .Reducer import Reducer
 from .Store import Store
 
-__all__ = (
-    'CombineReducers', 'CombineReducersStack', 'init_reducers',
-    'MergeReducers', 'Reducer', 'Store',
-)
+__all__ = 'Reducer', 'Store', *_reducer_utils_all

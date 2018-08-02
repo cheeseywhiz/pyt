@@ -1,6 +1,6 @@
 import dataclasses
 import actions
-from .Reducer import Reducer
+from ..Reducer import Reducer
 from .CombineReducers import CombineReducers
 from .init_reducers import init_reducers
 
