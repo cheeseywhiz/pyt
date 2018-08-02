@@ -1,29 +1,29 @@
-from dataclasses import dataclass
-from enum import auto, Enum, Flag
+import dataclasses
+import enum
 import math
 
 
-class StrEnum(Enum):
+class StrEnum(enum.Enum):
     # https://docs.python.org/3/library/enum.html#using-automatic-values
     def _generate_next_value_(name, start, count, last_values):
         return name
 
 
 class Stack:
-    @dataclass(frozen=True)
+    @dataclasses.dataclass(frozen=True)
     class Push:
         pass
 
-    @dataclass(frozen=True)
+    @dataclasses.dataclass(frozen=True)
     class Pop:
         pass
 
-    @dataclass(frozen=True)
+    @dataclasses.dataclass(frozen=True)
     class Clear:
         pass
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class SetMatrix:
     xi: (int, float) = None
     yi: (int, float) = None
@@ -53,60 +53,60 @@ class SetMatrix:
             0, ratio, 0,
         )
 
-    @dataclass(frozen=True)
+    @dataclasses.dataclass(frozen=True)
     class Reset:
         pass
 
 
 class OperationNames(StrEnum):
-    DEFAULT = auto()
-    ROTATION = auto()
-    SCALE = auto()
-    TRANSLATION = auto()
-    MANUAL = auto()
+    DEFAULT = enum.auto()
+    ROTATION = enum.auto()
+    SCALE = enum.auto()
+    TRANSLATION = enum.auto()
+    MANUAL = enum.auto()
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class UpdateOperation:
     operation_name: OperationNames
 
 
-class GeometryOptions(Flag):
-    GLOBALS = auto()
-    LOCALS = auto()
-    FRAMES = auto()
-    INTERMEDIATE_HELPERS = auto()
+class GeometryOptions(enum.Flag):
+    GLOBALS = enum.auto()
+    LOCALS = enum.auto()
+    FRAMES = enum.auto()
+    INTERMEDIATE_HELPERS = enum.auto()
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class ToggleGeometryOption:
     geometry_option: GeometryOptions
 
 
 class ShapeNames(StrEnum):
-    NONE = auto()
-    SQUARE = auto()
-    UNIT_CIRCLE = auto()
-    KNOT = auto()
-    FROM_JSON = auto()
+    NONE = enum.auto()
+    SQUARE = enum.auto()
+    UNIT_CIRCLE = enum.auto()
+    KNOT = enum.auto()
+    FROM_JSON = enum.auto()
 
 
 class Shape:
-    @dataclass(frozen=True)
+    @dataclasses.dataclass(frozen=True)
     class UpdateShapeName:
         shape_name: ShapeNames
 
-    @dataclass(frozen=True)
+    @dataclasses.dataclass(frozen=True)
     class UpdateFile:
         fname: str
         data: None
 
 
 class EntryOrders(StrEnum):
-    GLOBAL = auto()
-    LOCAL = auto()
+    GLOBAL = enum.auto()
+    LOCAL = enum.auto()
 
 
-@dataclass(frozen=True)
+@dataclasses.dataclass(frozen=True)
 class UpdateEntryOrder:
     entry_order: EntryOrders

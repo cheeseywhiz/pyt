@@ -1,13 +1,13 @@
 import dataclasses
 import actions
-import Reducer
-from CombineReducers import CombineReducers
-from init_reducers import init_reducers
+from .Reducer import Reducer
+from .CombineReducers import CombineReducers
+from .init_reducers import init_reducers
 
 __all__ = 'CombineReducersStack',
 
 
-class Stack(Reducer.Reducer[list]):
+class Stack(Reducer[list]):
     field = dataclasses.field(default_factory=list)
 
     def reduce(state=None, action=None):

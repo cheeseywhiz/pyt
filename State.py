@@ -1,11 +1,7 @@
 import dataclasses
 import typing
 import actions
-from Reducer import Reducer
-from init_reducers import init_reducers
-from CombineReducers import CombineReducers
-from CombineReducersStack import CombineReducersStack
-from MergeReducers import MergeReducers
+import redux
 
 __all__ = 'State',
 
@@ -40,7 +36,7 @@ class Matrix:
         return self
 
 
-class Operation(Reducer[actions.OperationNames]):
+class Operation(redux.Reducer[actions.OperationNames]):
     def reduce(state=None, action=None):
         if state is None:
             state = actions.OperationNames.DEFAULT
@@ -51,7 +47,7 @@ class Operation(Reducer[actions.OperationNames]):
         return state
 
 
-class Geometry(Reducer[actions.GeometryOptions]):
+class Geometry(redux.Reducer[actions.GeometryOptions]):
     def reduce(state=None, action=None):
         if state is None:
             state = actions.GeometryOptions.FRAMES
@@ -62,7 +58,7 @@ class Geometry(Reducer[actions.GeometryOptions]):
         return state
 
 
-class EntryOrder(Reducer[actions.EntryOrders]):
+class EntryOrder(redux.Reducer[actions.EntryOrders]):
     def reduce(state=None, action=None):
         if state is None:
             state = actions.EntryOrders.GLOBAL
@@ -73,7 +69,7 @@ class EntryOrder(Reducer[actions.EntryOrders]):
         return state
 
 
-class ShapeName(Reducer[actions.ShapeNames]):
+class ShapeName(redux.Reducer[actions.ShapeNames]):
     def reduce(state=None, action=None):
         if state is None:
             state = actions.ShapeNames.NONE
@@ -97,22 +93,22 @@ class File:
 
 
 @dataclasses.dataclass(frozen=True)
-@init_reducers
-class Shape(CombineReducers):
+@redux.init_reducers
+class Shape(redux.CombineReducers):
     shape_name: ShapeName
     file: File
 
 
-class State(MergeReducers):
+class State(redux.MergeReducers):
     @dataclasses.dataclass(frozen=True)
-    @init_reducers
-    class Stack(CombineReducersStack):
+    @redux.init_reducers
+    class Stack(redux.CombineReducersStack):
         matrix: Matrix
         operation: Operation
 
     @dataclasses.dataclass(frozen=True)
-    @init_reducers
-    class StateBase(CombineReducers):
+    @redux.init_reducers
+    class StateBase(redux.CombineReducers):
         geometry: Geometry
         entry_order: EntryOrder
         shape: Shape

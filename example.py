@@ -1,10 +1,10 @@
 import pprint
 import dataclasses
-from Store import Store
+import redux
 from State import State
 import actions
 
-store = Store(State())
+store = redux.Store(State())
 
 
 def print_state():
