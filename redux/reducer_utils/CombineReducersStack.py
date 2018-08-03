@@ -1,8 +1,8 @@
 import dataclasses
-import actions
 from ..Reducer import Reducer
 from .CombineReducers import CombineReducers
 from .init_reducers import init_reducers
+from . import stack_actions
 
 __all__ = 'CombineReducersStack',
 
@@ -11,7 +11,7 @@ class Stack(Reducer[list]):
     field = dataclasses.field(default_factory=list)
 
     def reduce(state=None, action=None):
-        if state is None or isinstance(action, actions.Stack.Clear):
+        if state is None or isinstance(action, stack_actions.Clear):
             state = []
 
         return state
@@ -23,10 +23,10 @@ class CombineReducersStackBase(CombineReducers):
     stack: Stack
 
     def stack_update(self, action=None):
-        if isinstance(action, actions.Stack.Push):
+        if isinstance(action, stack_actions.Push):
             entry = self._stack_entry(**vars(self))
             return {'stack': [*self.stack, entry]}
-        elif isinstance(action, actions.Stack.Pop):
+        elif isinstance(action, stack_actions.Pop):
             if not self.stack:
                 return self
 

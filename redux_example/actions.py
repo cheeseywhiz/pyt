@@ -9,20 +9,6 @@ class StrEnum(enum.Enum):
         return name
 
 
-class Stack:
-    @dataclasses.dataclass(frozen=True)
-    class Push:
-        pass
-
-    @dataclasses.dataclass(frozen=True)
-    class Pop:
-        pass
-
-    @dataclasses.dataclass(frozen=True)
-    class Clear:
-        pass
-
-
 @dataclasses.dataclass(frozen=True)
 class SetMatrix:
     xi: (int, float) = None

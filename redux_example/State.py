@@ -26,8 +26,8 @@ class Matrix:
             return type(self)(**kwargs)
         elif isinstance(action, (
                 actions.UpdateOperation,
-                actions.Stack.Push,
-                actions.SetMatrix.Reset
+                redux.stack_actions.Push,
+                actions.SetMatrix.Reset,
         )):
             return type(self)()
 

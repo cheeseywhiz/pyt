@@ -26,21 +26,21 @@ def main():
     actions1 = [
         actions.UpdateOperation(actions.OperationNames.SCALE),
         actions.SetMatrix.scale(3),
-        actions.Stack.Push(),
+        redux.stack_actions.Push(),
     ]
 
     actions2 = [
         actions.UpdateOperation(actions.OperationNames.ROTATION),
         actions.SetMatrix.rotation(90),
-        actions.Stack.Push(),
+        redux.stack_actions.Push(),
         actions.UpdateOperation(actions.OperationNames.TRANSLATION),
         actions.SetMatrix(ox=3, oy=4),
     ]
 
     actions3 = [
-        actions.Stack.Pop(),
+        redux.stack_actions.Pop(),
         actions.SetMatrix.Reset(),
-        actions.Stack.Clear(),
+        redux.stack_actions.Clear(),
     ]
 
     print_state()
