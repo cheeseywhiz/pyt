@@ -3,6 +3,7 @@ import dataclasses
 import redux
 from State import State
 import actions
+import my_selectors
 
 store = redux.Store(State())
 
@@ -32,6 +33,8 @@ def main():
         actions.UpdateOperation(actions.OperationNames.ROTATION),
         actions.SetMatrix.rotation(90),
         actions.Stack.Push(),
+        actions.UpdateOperation(actions.OperationNames.TRANSLATION),
+        actions.SetMatrix(ox=3, oy=4),
     ]
 
     actions3 = [
@@ -45,6 +48,10 @@ def main():
     print_state_unsubscribe()
     do_actions(actions2)
     print_state()
+
+    for frame in my_selectors.globals_(store.state):
+        print(frame)
+
     print()
     print_state_unsubscribe = store.subscribe(print_state)
     do_actions(actions3)

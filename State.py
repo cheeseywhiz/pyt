@@ -15,17 +15,15 @@ class Matrix:
     yj: typing.Union[int, float] = 1
     oy: typing.Union[int, float] = 0
 
-    def merge(self, other):
-        kwargs = {}
-
-        for data in (self, other):
-            kwargs.update(vars(data))
-
-        return type(self)(**kwargs)
-
     def reduce(self, action=None):
         if isinstance(action, actions.SetMatrix):
-            return self.merge(action)
+            kwargs = vars(self).copy()
+            kwargs.update({
+                name: value
+                for name, value in vars(action).items()
+                if value is not None
+            })
+            return type(self)(**kwargs)
         elif isinstance(action, (
                 actions.UpdateOperation,
                 actions.Stack.Push,
@@ -34,6 +32,12 @@ class Matrix:
             return type(self)()
 
         return self
+
+    def is_identity(self):
+        return self == self.identity
+
+
+Matrix.identity = Matrix()
 
 
 class Operation(redux.Reducer[actions.OperationNames]):
@@ -99,12 +103,15 @@ class Shape(redux.CombineReducers):
     file: File
 
 
+@dataclasses.dataclass(frozen=True)
+@redux.init_reducers
+class Stack(redux.CombineReducersStack):
+    matrix: Matrix
+    operation: Operation
+
+
 class State(redux.MergeReducers):
-    @dataclasses.dataclass(frozen=True)
-    @redux.init_reducers
-    class Stack(redux.CombineReducersStack):
-        matrix: Matrix
-        operation: Operation
+    Stack = Stack
 
     @dataclasses.dataclass(frozen=True)
     @redux.init_reducers
