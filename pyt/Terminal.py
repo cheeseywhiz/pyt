@@ -49,12 +49,15 @@ class Terminal(redux.CombineReducers):
         self.lines.append([])
         return self
 
+    def reset(self):
+        return type(self)()
+
     def reset_string_buffer(self, string_type=None):
         self.string_buffer = []
         self.string_type = string_type
         return self
 
-    def reset_csi_buffer(self, string_type=None):
+    def reset_csi_buffer(self):
         self.csi_buffer = []
         return self
 
@@ -90,7 +93,7 @@ class Terminal(redux.CombineReducers):
         elif C1 is control_codes.C1_7B.NEL:
             return self.add_newline()
         elif C1 is control_codes.C1_7B.RST:
-            return type(self)()
+            return self.reset()
 
         print(f'Unhandled C1: {C1 !r}')
         return self
@@ -115,13 +118,17 @@ class Terminal(redux.CombineReducers):
         self.next_char_mode = NextCharMode.CHAR
         return self
 
-    def parse_csi(self):
-        self.next_char_mode = NextCharMode.CHAR
-        final_byte = control_codes.CSI(ord(self.csi_buffer[-1]))
-        csi = ''.join(self.csi_buffer[:-1])
-        self.reset_csi_buffer()
+    def parse_csi_impl(self, csi, final_byte):
         print(f'Received csi: ({final_byte !r}) {csi !r}')
         return self
+
+    def parse_csi(self):
+        self.next_char_mode = NextCharMode.CHAR
+        csi = ''.join(self.csi_buffer[:-1])
+        final_byte = control_codes.CSI(ord(self.csi_buffer[-1]))
+        return self \
+            .reset_csi_buffer() \
+            .parse_csi_impl(csi, final_byte)
 
     def handle_csi(self, char):
         code_point = ord(char)
@@ -138,12 +145,17 @@ class Terminal(redux.CombineReducers):
         print(f'Unknown csi: %s' % hex(ord(char)))
         return self
 
+    def parse_string_impl(self, string_type, string):
+        print(f'Received string ({string_type !r}) {string !r}')
+        return self
+
     def parse_string(self):
         self.next_char_mode = NextCharMode.CHAR
+        string_type = self.string_type
         string = ''.join(self.string_buffer)
-        print(f'Received string ({self.string_type !r}) {string !r}')
-        self.reset_string_buffer()
-        return self
+        return self \
+            .reset_string_buffer() \
+            .parse_string_impl(string_type, string)
 
     def handle_string_C0(self, C0):
         if C0 is control_codes.C0.BEL:
