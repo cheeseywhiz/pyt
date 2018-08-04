@@ -24,23 +24,37 @@ class NextCharMode(StrEnum):
 
 @dataclasses.dataclass
 class Terminal(redux.CombineReducers):
-    lines: typing.List[str] = dataclasses.field(
-        default_factory=lambda: [''],
+    lines: typing.List[typing.List[str]] = dataclasses.field(
+        default_factory=lambda: [[]],
     )
     next_char_mode: NextCharMode = NextCharMode.CHAR
+    string_type: control_codes.C1_7B = None
+    string_buffer: typing.List[str] = dataclasses.field(
+        default_factory=list,
+    )
 
     def copy(self):
         return type(self)(
             self.lines[:],
             self.next_char_mode,
+            self.string_type,
+            self.string_buffer[:],
         )
 
     def add_char(self, char):
-        self.lines[-1] += char
+        self.lines[-1].append(char)
         return self
 
     def add_newline(self):
-        self.lines.append('')
+        self.lines.append([])
+        return self
+
+    def reset_string_buffer(self, string_type=None):
+        self.string_buffer = []
+
+        if string_type is not None:
+            self.string_type = string_type
+
         return self
 
     def handle_C0(self, C0):
@@ -71,7 +85,7 @@ class Terminal(redux.CombineReducers):
                 control_codes.C1_7B.SOS,
         ):
             self.next_char_mode = NextCharMode.STRING
-            return self
+            return self.reset_string_buffer(C1)
         elif C1 is control_codes.C1_7B.NEL:
             return self.add_newline()
 
@@ -120,6 +134,9 @@ class Terminal(redux.CombineReducers):
 
     def parse_string(self):
         self.next_char_mode = NextCharMode.CHAR
+        string = ''.join(self.string_buffer)
+        self.reset_string_buffer()
+        print(f'Received string ({self.string_type !r}) {string !r}')
         return self
 
     def handle_string_C0(self, C0):
@@ -138,7 +155,7 @@ class Terminal(redux.CombineReducers):
         if C0 is not None:
             return self.handle_string_C0(C0)
 
-        print('Unknown string: %s' % hex(ord(char)))
+        self.string_buffer.append(char)
         return self
 
     def handle_string_esc(self, char):
@@ -148,9 +165,10 @@ class Terminal(redux.CombineReducers):
             return self.parse_string()
         else:
             # string interrupted
-            # TODO: reset string buffer
             self.next_char_mode = NextCharMode.ESC
-            return self.handle_esc(char)
+            return self \
+                .reset_string_buffer() \
+                .handle_esc()
 
     def put_char(self, char):
         if self.next_char_mode is NextCharMode.CHAR:
@@ -173,6 +191,10 @@ class Terminal(redux.CombineReducers):
             self_chain = self_chain.put_char(char)
 
         return self_chain
+
+    @property
+    def screen(self):
+        return '\n'.join(''.join(row) for row in self.lines)
 
     def reduce(self, action=None):
         if isinstance(action, actions.PutChar):
