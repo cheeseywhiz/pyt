@@ -8,15 +8,26 @@ class EnumMeta(enum.EnumMeta):
     def __contains__(self, value):
         return value in self._value2member_map_
 
+    def __call__(self, value, names=None, **kwargs):
+        if names is None and value not in self:
+            return None
+        else:
+            return super().__call__(value, names=names, **kwargs)
 
-class IntEnum(enum.IntEnum, metaclass=EnumMeta):
+
+class HexInt(int):
+    def __repr__(self):
+        return hex(self)
+
+
+class HexIntEnum(HexInt, enum.Enum, metaclass=EnumMeta):
     pass
 
 
 DEL = 0x7f
 
 
-class C0(IntEnum):
+class C0(HexIntEnum):
     NUL = 0x00
     SOH = 0x01
     STX = 0x02
@@ -54,7 +65,7 @@ class C0(IntEnum):
     IS1 = 0x1f
 
 
-class C1_7B(IntEnum):
+class C1_7B(HexIntEnum):
     # 0x40
     # 0x41
     BPH = 0x42
@@ -90,7 +101,7 @@ class C1_7B(IntEnum):
     APC = 0x5f
 
 
-class C1_8B(IntEnum):
+class C1_8B(HexIntEnum):
     # 0x80
     # 0x81
     BPH = 0x82
@@ -126,7 +137,7 @@ class C1_8B(IntEnum):
     APC = 0x9f
 
 
-class CSI(IntEnum):
+class CSI(HexIntEnum):
     # Final Bytes of control sequences without Intermediate Bytes
     ICH = 0x40
     CUU = 0x41
