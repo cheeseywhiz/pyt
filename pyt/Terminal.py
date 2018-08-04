@@ -170,19 +170,18 @@ class Terminal(redux.CombineReducers):
                 .reset_string_buffer() \
                 .handle_esc()
 
-    def put_char(self, char):
-        if self.next_char_mode is NextCharMode.CHAR:
-            return self.handle_char(char)
-        elif self.next_char_mode is NextCharMode.ESC:
-            return self.handle_esc(char)
-        elif self.next_char_mode is NextCharMode.CSI:
-            return self.handle_csi(char)
-        elif self.next_char_mode is NextCharMode.STRING:
-            return self.handle_string(char)
-        elif self.next_char_mode is NextCharMode.STRING_ESC:
-            return self.handle_string_esc(char)
+    @property
+    def put_char_func(self):
+        return {
+            NextCharMode.CHAR: self.handle_char,
+            NextCharMode.ESC: self.handle_esc,
+            NextCharMode.CSI: self.handle_csi,
+            NextCharMode.STRING: self.handle_string,
+            NextCharMode.STRING_ESC: self.handle_string_esc,
+        }[self.next_char_mode]
 
-        return self
+    def put_char(self, char):
+        return self.put_char_func(char)
 
     def put_string(self, string):
         self_chain = self
