@@ -39,8 +39,16 @@ class Terminal(redux.CombineReducers):
 
         return self.add_char(char)
 
+    def put_string(self, string):
+        for char in string:
+            self.put_char(char)
+
+        return self
+
     def reduce(self, action=None):
         if isinstance(action, actions.PutChar):
             return self.copy().put_char(action.char)
+        if isinstance(action, actions.PutString):
+            return self.copy().put_string(action.string)
 
         return self
