@@ -69,7 +69,7 @@ class Terminal(redux.CombineReducers):
             self.next_char_mode = NextCharMode.ESC
             return self
 
-        print(f'Unknown C0: {C0 !r}')
+        print(f'Unhandled C0: {C0 !r}')
         return self
 
     def handle_C1(self, C1):
@@ -89,8 +89,10 @@ class Terminal(redux.CombineReducers):
             return self.reset_string_buffer(C1)
         elif C1 is control_codes.C1_7B.NEL:
             return self.add_newline()
+        elif C1 is control_codes.C1_7B.RST:
+            return type(self)()
 
-        print(f'Unknown C1: {C1 !r}')
+        print(f'Unhandled C1: {C1 !r}')
         return self
 
     def handle_char(self, char):
@@ -108,8 +110,6 @@ class Terminal(redux.CombineReducers):
 
         if C1 is not None:
             return self.handle_C1(C1)
-        if char == 'c':
-            return type(self)()
 
         print(f'Unknown esc: %s' % hex(ord(char)))
         self.next_char_mode = NextCharMode.CHAR
@@ -141,8 +141,8 @@ class Terminal(redux.CombineReducers):
     def parse_string(self):
         self.next_char_mode = NextCharMode.CHAR
         string = ''.join(self.string_buffer)
-        self.reset_string_buffer()
         print(f'Received string ({self.string_type !r}) {string !r}')
+        self.reset_string_buffer()
         return self
 
     def handle_string_C0(self, C0):

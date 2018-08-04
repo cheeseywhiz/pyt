@@ -66,6 +66,12 @@ class C0(HexIntEnum):
 
 
 class C1_7B(HexIntEnum):
+    # Set charset
+    CS1 = 0x28  # (
+    CS2 = 0x29  # )
+    CS3 = 0x2a  # *
+    CS4 = 0x2b  # +
+
     PAM = 0x3d  # =  # Application keypad
     PNM = 0x3e  # >  # Numeric keypad
 
@@ -102,6 +108,8 @@ class C1_7B(HexIntEnum):
     OSC = 0x5d  # ]
     PM = 0x5e  # ^
     APC = 0x5f  # _
+
+    RST = 0x63  # c  # Reset
 
 
 class C1_8B(HexIntEnum):
