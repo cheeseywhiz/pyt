@@ -23,7 +23,11 @@ class TerminalStore(redux.Store):
 
 def main():
     store = TerminalStore()
-    store.dispatch(actions.PutChar('a'))
+
+    string = 'a\nb\x0bc\x0cd'
+
+    for char in string:
+        store.dispatch(actions.PutChar(char))
 
 
 if __name__ == '__main__':
