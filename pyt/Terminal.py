@@ -29,16 +29,16 @@ class Terminal(redux.CombineReducers):
     )
     next_char_mode: NextCharMode = NextCharMode.CHAR
     string_type: control_codes.C1_7B = None
-    string_buffer: typing.List[str] = dataclasses.field(
-        default_factory=list,
-    )
+    string_buffer: typing.List[str] = None
+    csi_buffer: typing.List[str] = None
 
     def copy(self):
         return type(self)(
-            self.lines[:],
+            [row[:] for row in self.lines],
             self.next_char_mode,
             self.string_type,
-            self.string_buffer[:],
+            None if self.string_buffer is None else self.string_buffer[:],
+            None if self.csi_buffer is None else self.csi_buffer[:],
         )
 
     def add_char(self, char):
@@ -51,10 +51,11 @@ class Terminal(redux.CombineReducers):
 
     def reset_string_buffer(self, string_type=None):
         self.string_buffer = []
+        self.string_type = string_type
+        return self
 
-        if string_type is not None:
-            self.string_type = string_type
-
+    def reset_csi_buffer(self, string_type=None):
+        self.csi_buffer = []
         return self
 
     def handle_C0(self, C0):
@@ -76,7 +77,7 @@ class Terminal(redux.CombineReducers):
 
         if C1 is control_codes.C1_7B.CSI:
             self.next_char_mode = NextCharMode.CSI
-            return self
+            return self.reset_csi_buffer()
         elif C1 in (
                 control_codes.C1_7B.APC,
                 control_codes.C1_7B.DCS,
@@ -107,26 +108,31 @@ class Terminal(redux.CombineReducers):
 
         if C1 is not None:
             return self.handle_C1(C1)
+        if char == 'c':
+            return type(self)()
 
         print(f'Unknown esc: %s' % hex(ord(char)))
         self.next_char_mode = NextCharMode.CHAR
+        return self
+
+    def parse_csi(self):
+        self.next_char_mode = NextCharMode.CHAR
+        final_byte = control_codes.CSI(ord(self.csi_buffer[-1]))
+        csi = ''.join(self.csi_buffer[:-1])
+        self.reset_csi_buffer()
+        print(f'Received csi: ({final_byte !r}) {csi !r}')
         return self
 
     def handle_csi(self, char):
         code_point = ord(char)
         final_byte = control_codes.CSI(code_point)
 
-        if final_byte is not None:
-            self.next_char_mode = NextCharMode.CHAR
-            print(f'Unknown final csi: {final_byte !r}')
-            return self
-        elif code_point in range(0x20, 0x30):
-            intermediate_byte = code_point
-            print(f'Unknown intermediate csi: %s' % hex(ord(char)))
-            return self
-        elif code_point in range(0x30, 0x40):
-            parameter_byte = code_point
-            print(f'Unknown parameter csi: %s' % hex(ord(char)))
+        if final_byte is not None or code_point in range(0x20, 0x40):
+            self.csi_buffer.append(char)
+
+            if final_byte is not None:
+                return self.parse_csi()
+
             return self
 
         print(f'Unknown csi: %s' % hex(ord(char)))

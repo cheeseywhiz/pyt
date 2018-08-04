@@ -13,7 +13,7 @@ class TerminalStore(redux.Store):
 
     def print_state(self):
         print(self.state)
-        print(self.state.screen)
+        print(self.state.screen, end='')
 
     def subscribe_print_state(self):
         self._unsubscribe_print_state = super().subscribe(self.print_state)
