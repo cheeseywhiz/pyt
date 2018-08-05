@@ -109,7 +109,7 @@ class C1_7B(HexIntEnum):
     PM = 0x5e  # ^
     APC = 0x5f  # _
 
-    RST = 0x63  # c  # Reset
+    RIS = 0x63  # c  # Reset
 
 
 class C1_8B(HexIntEnum):

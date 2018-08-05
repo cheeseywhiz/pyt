@@ -3,6 +3,7 @@ import typing
 import enum
 from . import actions
 from . import control_codes
+from .ParsedCSI import ParsedCSI
 
 __all__ = 'Terminal',
 
@@ -102,7 +103,7 @@ class Terminal:
             return self.reset_string_buffer(C1)
         elif C1 is control_codes.C1_7B.NEL:
             return self.add_newline()
-        elif C1 is control_codes.C1_7B.RST:
+        elif C1 is control_codes.C1_7B.RIS:
             return self.reset()
 
         print(f'Unhandled C1: {C1 !r}')
@@ -128,23 +129,28 @@ class Terminal:
         self.next_char_mode = NextCharMode.CHAR
         return self
 
-    def parse_csi_impl(self, csi, final_byte):
-        print(f'Received csi: ({final_byte !r}) {csi !r}')
+    def do_csi(self, csi):
+        print(f'Received csi: {csi}')
         return self
 
     def parse_csi(self):
         self.next_char_mode = NextCharMode.CHAR
-        csi = ''.join(self.csi_buffer[:-1])
+        csi_string = ''.join(self.csi_buffer[:-1])
         final_byte = control_codes.CSI(ord(self.csi_buffer[-1]))
+        csi = ParsedCSI(final_byte, csi_string)
         return self \
             .reset_csi_buffer() \
-            .parse_csi_impl(csi, final_byte)
+            .do_csi(csi)
 
     def handle_csi(self, char):
         code_point = ord(char)
+
+        if code_point in range(0x20, 0x30):
+            print('Ignoring intermediate byte (%s)' % hex(code_point))
+
         final_byte = control_codes.CSI(code_point)
 
-        if final_byte is not None or code_point in range(0x20, 0x40):
+        if final_byte is not None or code_point in range(0x30, 0x40):
             self.csi_buffer.append(char)
 
             if final_byte is not None:
