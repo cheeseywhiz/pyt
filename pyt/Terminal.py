@@ -1,11 +1,15 @@
 import dataclasses
 import typing
 import enum
-import redux
 from . import actions
 from . import control_codes
 
 __all__ = 'Terminal',
+
+
+def empty_matrix(rows, columns, obj=None):
+    row = [obj] * columns
+    return [row[:] for _ in range(rows)]
 
 
 class StrEnum(enum.Enum):
@@ -22,31 +26,37 @@ class NextCharMode(StrEnum):
     STRING_ESC = enum.auto()
 
 
+CursorT = typing.Tuple[int, int]
+
+
 @dataclasses.dataclass
-class Terminal(redux.CombineReducers):
-    lines: typing.List[typing.List[str]] = dataclasses.field(
-        default_factory=lambda: [[]],
-    )
+class Terminal:
+    screen: typing.Dict[CursorT, str] = dataclasses.field(default_factory=dict)
     next_char_mode: NextCharMode = NextCharMode.CHAR
     string_type: control_codes.C1_7B = None
     string_buffer: typing.List[str] = None
     csi_buffer: typing.List[str] = None
+    cursor: CursorT = (0, 0)
 
     def copy(self):
         return type(self)(
-            [row[:] for row in self.lines],
+            self.screen.copy(),
             self.next_char_mode,
             self.string_type,
             None if self.string_buffer is None else self.string_buffer[:],
             None if self.csi_buffer is None else self.csi_buffer[:],
+            self.cursor,
         )
 
     def add_char(self, char):
-        self.lines[-1].append(char)
+        self.screen[self.cursor] = char
+        x, y = self.cursor
+        self.cursor = x + 1, y
         return self
 
     def add_newline(self):
-        self.lines.append([])
+        x, y = self.cursor
+        self.cursor = 0, y + 1
         return self
 
     def reset(self):
@@ -210,8 +220,18 @@ class Terminal(redux.CombineReducers):
         return self_chain
 
     @property
-    def screen(self):
-        return '\n'.join(''.join(row) for row in self.lines)
+    def screen_str(self):
+        width = 80
+        height = 24
+        screen = empty_matrix(height, width, ' ')
+
+        for (x, y), char in self.screen.items():
+            if x >= width or y >= height:
+                continue
+
+            screen[y][x] = char
+
+        return '\n'.join(''.join(row) for row in screen)
 
     def reduce(self, action=None):
         if isinstance(action, actions.PutChar):
