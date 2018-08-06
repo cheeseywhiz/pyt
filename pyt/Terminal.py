@@ -32,7 +32,9 @@ CursorT = typing.Tuple[int, int]
 
 @dataclasses.dataclass
 class Terminal:
-    screen: typing.Dict[CursorT, str] = dataclasses.field(default_factory=dict)
+    screen: typing.Dict[CursorT, str] = dataclasses.field(
+        default_factory=dict, repr=False,
+    )
     next_char_mode: NextCharMode = NextCharMode.CHAR
     string_type: control_codes.C1_7B = None
     string_buffer: typing.List[str] = None
@@ -49,16 +51,78 @@ class Terminal:
             self.cursor,
         )
 
-    def add_char(self, char):
-        self.screen[self.cursor] = char
+    def cursor_up(self, n_lines=None):
+        if n_lines is None:
+            n_lines = 1
+
         x, y = self.cursor
-        self.cursor = x + 1, y
+        self.cursor = x, y - n_lines
         return self
 
-    def add_newline(self):
+    def cursor_down(self, n_lines=None):
+        if n_lines is None:
+            n_lines = 1
+
         x, y = self.cursor
-        self.cursor = 0, y + 1
+        self.cursor = x, y + n_lines
         return self
+
+    def cursor_forward(self, n_cols=None):
+        if n_cols is None:
+            n_cols = 1
+
+        x, y = self.cursor
+        self.cursor = x + n_cols, y
+        return self
+
+    def cursor_backward(self, n_cols=None):
+        if n_cols is None:
+            n_cols = 1
+
+        x, y = self.cursor
+        self.cursor = x - n_cols, y
+        return self
+
+    def cursor_character_absolute(self, nth_col=None):
+        if nth_col is None:
+            nth_col = 1
+
+        x, y = self.cursor
+        self.cursor = nth_col - 1, y
+        return self
+
+    def cursor_next_line(self, n_lines=None):
+        return self \
+            .carriage_return() \
+            .cursor_down(n_lines)
+
+    def cursor_preceding_line(self, n_lines=None):
+        return self \
+            .carriage_return() \
+            .cursor_up(n_lines)
+
+    def cursor_position(self, nth_line=None, nth_col=None):
+        if nth_line is None:
+            nth_line = 1
+
+        if nth_col is None:
+            nth_col = 1
+
+        self.cursor = nth_col - 1, nth_line - 1
+        return self
+
+    def backspace(self):
+        return self.cursor_backward()
+
+    def carriage_return(self):
+        return self.cursor_character_absolute()
+
+    def line_feed(self):
+        return self.cursor_next_line()
+
+    def add_char(self, char):
+        self.screen[self.cursor] = char
+        return self.cursor_forward()
 
     def reset(self):
         return type(self)()
@@ -73,12 +137,16 @@ class Terminal:
         return self
 
     def handle_C0(self, C0):
+        if C0 is control_codes.C0.BS:
+            return self.backspace()
         if C0 in (
                 control_codes.C0.LF,
                 control_codes.C0.VT,
                 control_codes.C0.FF,
         ):
-            return self.add_newline()
+            return self.line_feed()
+        elif C0 is control_codes.C0.CR:
+            return self.carriage_return()
         elif C0 is control_codes.C0.ESC:
             self.next_char_mode = NextCharMode.ESC
             return self
@@ -130,7 +198,24 @@ class Terminal:
         return self
 
     def do_csi(self, csi):
-        print(f'Received csi: {csi}')
+        if csi.csi_type is control_codes.CSI.CUU:
+            return self.cursor_up(*csi.args)
+        elif csi.csi_type is control_codes.CSI.CUD:
+            return self.cursor_down(*csi.args)
+        elif csi.csi_type is control_codes.CSI.CUF:
+            return self.cursor_forward(*csi.args)
+        elif csi.csi_type is control_codes.CSI.CUB:
+            return self.cursor_backward(*csi.args)
+        elif csi.csi_type is control_codes.CSI.CNL:
+            return self.cursor_next_line(*csi.args)
+        elif csi.csi_type is control_codes.CSI.CPL:
+            return self.cursor_preceding_line(*csi.args)
+        elif csi.csi_type is control_codes.CSI.CHA:
+            return self.cursor_character_absolute(*csi.args)
+        elif csi.csi_type is control_codes.CSI.CUP:
+            return self.cursor_position(*csi.args)
+
+        print(f'Unhandled csi: {csi}')
         return self
 
     def parse_csi(self):
@@ -227,8 +312,8 @@ class Terminal:
 
     @property
     def screen_str(self):
-        width = 80
-        height = 24
+        width = 227
+        height = 56
         screen = empty_matrix(height, width, ' ')
 
         for (x, y), char in self.screen.items():

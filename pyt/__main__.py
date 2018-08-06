@@ -25,8 +25,8 @@ class TerminalStore(redux.Store):
 def main():
     store = TerminalStore()
 
-    with open('typescript') as file:
-        store.dispatch(actions.PutString(file.read()))
+    with open('typescript', 'rb') as file:
+        store.dispatch(actions.PutString(file.read().decode()))
 
 
 if __name__ == '__main__':
