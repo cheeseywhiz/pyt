@@ -32,13 +32,13 @@ CursorT = typing.Tuple[int, int]
 
 @dataclasses.dataclass
 class Terminal:
-    screen: typing.Dict[CursorT, str] = dataclasses.field(
+    screen: typing.Dict[CursorT, int] = dataclasses.field(
         default_factory=dict, repr=False,
     )
     next_char_mode: NextCharMode = NextCharMode.CHAR
     string_type: control_codes.C1_7B = None
-    string_buffer: typing.List[str] = None
-    csi_buffer: typing.List[str] = None
+    string_buffer: typing.List[int] = None
+    csi_buffer: typing.List[int] = None
     cursor: CursorT = (0, 0)
 
     def copy(self):
@@ -120,8 +120,8 @@ class Terminal:
     def line_feed(self):
         return self.cursor_next_line()
 
-    def add_char(self, char):
-        self.screen[self.cursor] = char
+    def add_char(self, code_point):
+        self.screen[self.cursor] = code_point
         return self.cursor_forward()
 
     def reset(self):
@@ -177,23 +177,21 @@ class Terminal:
         print(f'Unhandled C1: {C1 !r}')
         return self
 
-    def handle_char(self, char):
-        code_point = ord(char)
+    def handle_char(self, code_point):
         C0 = control_codes.C0(code_point)
 
         if C0 is not None:
             return self.handle_C0(C0)
 
-        return self.add_char(char)
+        return self.add_char(code_point)
 
-    def handle_esc(self, char):
-        code_point = ord(char)
+    def handle_esc(self, code_point):
         C1 = control_codes.C1_7B(code_point)
 
         if C1 is not None:
             return self.handle_C1(C1)
 
-        print(f'Unknown esc: %s' % hex(ord(char)))
+        print(f'Unknown esc: %s' % hex(code_point))
         self.next_char_mode = NextCharMode.CHAR
         return self
 
@@ -220,30 +218,28 @@ class Terminal:
 
     def parse_csi(self):
         self.next_char_mode = NextCharMode.CHAR
-        csi_string = ''.join(self.csi_buffer[:-1])
-        final_byte = control_codes.CSI(ord(self.csi_buffer[-1]))
+        csi_string = ''.join(map(chr, self.csi_buffer[:-1]))
+        final_byte = control_codes.CSI(self.csi_buffer[-1])
         csi = ParsedCSI(final_byte, csi_string)
         return self \
             .reset_csi_buffer() \
             .do_csi(csi)
 
-    def handle_csi(self, char):
-        code_point = ord(char)
-
+    def handle_csi(self, code_point):
         if code_point in range(0x20, 0x30):
             print('Ignoring intermediate byte (%s)' % hex(code_point))
 
         final_byte = control_codes.CSI(code_point)
 
         if final_byte is not None or code_point in range(0x30, 0x40):
-            self.csi_buffer.append(char)
+            self.csi_buffer.append(code_point)
 
             if final_byte is not None:
                 return self.parse_csi()
 
             return self
 
-        print(f'Unknown csi: %s' % hex(ord(char)))
+        print(f'Unknown csi: %s' % hex(code_point))
         return self
 
     def parse_string_impl(self, string_type, string):
@@ -253,7 +249,7 @@ class Terminal:
     def parse_string(self):
         self.next_char_mode = NextCharMode.CHAR
         string_type = self.string_type
-        string = ''.join(self.string_buffer)
+        string = ''.join(map(chr, self.string_buffer))
         return self \
             .reset_string_buffer() \
             .parse_string_impl(string_type, string)
@@ -267,19 +263,16 @@ class Terminal:
 
         return self
 
-    def handle_string(self, char):
-        code_point = ord(char)
+    def handle_string(self, code_point):
         C0 = control_codes.C0(code_point)
 
         if C0 is not None:
             return self.handle_string_C0(C0)
 
-        self.string_buffer.append(char)
+        self.string_buffer.append(code_point)
         return self
 
-    def handle_string_esc(self, char):
-        code_point = ord(char)
-
+    def handle_string_esc(self, code_point):
         if control_codes.C1_7B(code_point) is control_codes.C1_7B.ST:
             return self.parse_string()
         else:
@@ -299,14 +292,14 @@ class Terminal:
             NextCharMode.STRING_ESC: self.handle_string_esc,
         }[self.next_char_mode]
 
-    def put_char(self, char):
-        return self.put_char_func(char)
+    def put_code_point(self, code_point):
+        return self.put_char_func(code_point)
 
     def put_string(self, string):
         self_chain = self
 
-        for char in string:
-            self_chain = self_chain.put_char(char)
+        for code_point in map(ord, string):
+            self_chain = self_chain.put_code_point(code_point)
 
         return self_chain
 
@@ -314,20 +307,21 @@ class Terminal:
     def screen_str(self):
         width = 227
         height = 56
-        screen = empty_matrix(height, width, ' ')
+        screen = empty_matrix(height, width, ord(' '))
 
-        for (x, y), char in self.screen.items():
+        for (x, y), code_point in self.screen.items():
             if x >= width or y >= height:
                 continue
 
-            screen[y][x] = char
+            screen[y][x] = code_point
 
-        return '\n'.join(''.join(row) for row in screen)
+        print(self.screen)
+        return '\n'.join(''.join(map(chr, row)) for row in screen)
 
     def reduce(self, action=None):
-        if isinstance(action, actions.PutChar):
-            return self.copy().put_char(action.char)
-        if isinstance(action, actions.PutString):
+        if isinstance(action, actions.PutCodePoint):
+            return self.copy().put_code_point(action.code_point)
+        elif isinstance(action, actions.PutString):
             return self.copy().put_string(action.string)
 
         return self
