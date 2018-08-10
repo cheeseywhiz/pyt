@@ -26,7 +26,7 @@ def main():
     store = TerminalStore()
 
     with open('typescript', 'rb') as file:
-        store.dispatch(actions.PutString(file.read().decode()))
+        store.dispatch(actions.PutByteSequence(file.read()))
 
 
 if __name__ == '__main__':

@@ -1,6 +1,17 @@
 import dataclasses
+import typing
 
-__all__ = 'PutCodePoint', 'PutString'
+__all__ = 'PutByte', 'PutByteSequence', 'PutCodePoint', 'PutString'
+
+
+@dataclasses.dataclass(frozen=True)
+class PutByte:
+    byte: int
+
+
+@dataclasses.dataclass(frozen=True)
+class PutByteSequence:
+    byte_sequence: typing.List[int]
 
 
 @dataclasses.dataclass(frozen=True)

@@ -4,6 +4,7 @@ import enum
 from . import actions
 from . import control_codes
 from .ParsedCSI import ParsedCSI
+from .UnicodeBuffer import UnicodeBuffer
 
 __all__ = 'Terminal',
 
@@ -35,6 +36,7 @@ class Terminal:
     screen: typing.Dict[CursorT, int] = dataclasses.field(
         default_factory=dict, repr=False,
     )
+    unicode_buffer: UnicodeBuffer = UnicodeBuffer()
     next_char_mode: NextCharMode = NextCharMode.CHAR
     string_type: control_codes.C1_7B = None
     string_buffer: typing.List[int] = None
@@ -44,6 +46,7 @@ class Terminal:
     def copy(self):
         return type(self)(
             self.screen.copy(),
+            self.unicode_buffer.copy(),
             self.next_char_mode,
             self.string_type,
             None if self.string_buffer is None else self.string_buffer[:],
@@ -295,6 +298,17 @@ class Terminal:
     def put_code_point(self, code_point):
         return self.put_char_func(code_point)
 
+    def put_byte_sequence(self, byte_sequence):
+        self_chain = self
+
+        for code_point in self.unicode_buffer.add_bytes(*byte_sequence):
+            self_chain = self_chain.put_code_point(code_point)
+
+        return self_chain
+
+    def put_byte(self, byte):
+        return self.put_byte_sequence([byte])
+
     def put_string(self, string):
         self_chain = self
 
@@ -315,10 +329,13 @@ class Terminal:
 
             screen[y][x] = code_point
 
-        print(self.screen)
         return '\n'.join(''.join(map(chr, row)) for row in screen)
 
     def reduce(self, action=None):
+        if isinstance(action, actions.PutByte):
+            return self.copy().put_byte(action.byte)
+        if isinstance(action, actions.PutByteSequence):
+            return self.copy().put_byte_sequence(action.byte_sequence)
         if isinstance(action, actions.PutCodePoint):
             return self.copy().put_code_point(action.code_point)
         elif isinstance(action, actions.PutString):
