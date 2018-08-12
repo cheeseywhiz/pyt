@@ -17,40 +17,49 @@ class TerminalActions(TerminalBase):
         self.csi_buffer = []
         return self
 
+    def update_cursor(self, **changes):
+        tmp_cursor = self.cursor.replace(**changes)
+        tmp_x = tmp_cursor.x
+        tmp_y = tmp_cursor.y
+
+        if tmp_x < 0:
+            tmp_x = 0
+
+        if tmp_y < 0:
+            tmp_y = 0
+
+        self.cursor = tmp_cursor.replace(x=tmp_x, y=tmp_y)
+        return self
+
     def cursor_up(self, n_lines=None):
         if n_lines is None:
             n_lines = 1
 
-        self.cursor = self.cursor.replace(y=self.cursor.y - n_lines)
-        return self
+        return self.update_cursor(y=self.cursor.y - n_lines)
 
     def cursor_down(self, n_lines=None):
         if n_lines is None:
             n_lines = 1
 
-        self.cursor = self.cursor.replace(y=self.cursor.y + n_lines)
-        return self
+        return self.update_cursor(y=self.cursor.y + n_lines)
 
     def cursor_forward(self, n_cols=None):
         if n_cols is None:
             n_cols = 1
 
-        self.cursor = self.cursor.replace(x=self.cursor.x + n_cols)
-        return self
+        return self.update_cursor(x=self.cursor.x + n_cols)
 
     def cursor_backward(self, n_cols=None):
         if n_cols is None:
             n_cols = 1
 
-        self.cursor = self.cursor.replace(x=self.cursor.x - n_cols)
-        return self
+        return self.update_cursor(x=self.cursor.x - n_cols)
 
     def cursor_character_absolute(self, nth_col=None):
         if nth_col is None:
             nth_col = 1
 
-        self.cursor = self.cursor.replace(x=nth_col - 1)
-        return self
+        return self.update_cursor(x=nth_col - 1)
 
     def cursor_next_line(self, n_lines=None):
         return self \
@@ -69,8 +78,7 @@ class TerminalActions(TerminalBase):
         if nth_col is None:
             nth_col = 1
 
-        self.cursor = self.cursor.replace(x=nth_col - 1, y=nth_line - 1)
-        return self
+        return self.update_cursor(x=nth_col - 1, y=nth_line - 1)
 
     def backspace(self):
         return self.cursor_backward()
@@ -163,19 +171,16 @@ class TerminalActions(TerminalBase):
         if nth_line is None:
             nth_line = 1
 
-        self.cursor = self.cursor.replace(y=nth_line - 1)
-        return self
+        return self.update_cursor(y=nth_line - 1)
 
     def line_position_backwards(self, n_lines=None):
         if n_lines is None:
             n_lines = 1
 
-        self.cursor = self.cursor.replace(self.cursor.y + n_lines)
-        return self
+        return self.update_cursor(y=self.cursor.y + n_lines)
 
     def line_position_forwards(self, n_lines=None):
         if n_lines is None:
             n_lines = 1
 
-        self.cursor = self.cursor.replace(self.cursor.y - n_lines)
-        return self
+        return self.update_cursor(y=self.cursor.y - n_lines)
