@@ -81,38 +81,32 @@ class Terminal(TerminalActions):
         self.next_char_mode = NextCharMode.CHAR
         return self
 
-    def do_csi(self, csi):
-        if csi.csi_type is control_codes.CSI.CUU:
-            return self.cursor_up(*csi.args)
-        elif csi.csi_type is control_codes.CSI.CUD:
-            return self.cursor_down(*csi.args)
-        elif csi.csi_type is control_codes.CSI.CUF:
-            return self.cursor_forward(*csi.args)
-        elif csi.csi_type is control_codes.CSI.CUB:
-            return self.cursor_backward(*csi.args)
-        elif csi.csi_type is control_codes.CSI.CNL:
-            return self.cursor_next_line(*csi.args)
-        elif csi.csi_type is control_codes.CSI.CPL:
-            return self.cursor_preceding_line(*csi.args)
-        elif csi.csi_type is control_codes.CSI.CHA:
-            return self.cursor_character_absolute(*csi.args)
-        elif csi.csi_type is control_codes.CSI.CUP:
-            return self.cursor_position(*csi.args)
-        elif csi.csi_type is control_codes.CSI.ECH:
-            return self.erase_character(*csi.args)
-        elif csi.csi_type is control_codes.CSI.ED:
-            return self.erase_in_page(*csi.args)
-        elif csi.csi_type is control_codes.CSI.EL:
-            return self.erase_in_line(*csi.args)
-        elif csi.csi_type is control_codes.CSI.VPA:
-            return self.line_position_absolute(*csi.args)
-        elif csi.csi_type is control_codes.CSI.VPB:
-            return self.line_position_backwards(*csi.args)
-        elif csi.csi_type is control_codes.CSI.VPR:
-            return self.line_position_forwards(*csi.args)
+    def get_csi_func(self, csi_type):
+        return {
+            control_codes.CSI.CUU: self.cursor_up,
+            control_codes.CSI.CUD: self.cursor_down,
+            control_codes.CSI.CUF: self.cursor_forward,
+            control_codes.CSI.CUB: self.cursor_backward,
+            control_codes.CSI.CNL: self.cursor_next_line,
+            control_codes.CSI.CPL: self.cursor_preceding_line,
+            control_codes.CSI.CHA: self.cursor_character_absolute,
+            control_codes.CSI.CUP: self.cursor_position,
+            control_codes.CSI.ECH: self.erase_character,
+            control_codes.CSI.ED: self.erase_in_page,
+            control_codes.CSI.EL: self.erase_in_line,
+            control_codes.CSI.VPA: self.line_position_absolute,
+            control_codes.CSI.VPB: self.line_position_backwards,
+            control_codes.CSI.VPR: self.line_position_forwards,
+        }.get(csi_type)
 
-        print(f'Unhandled csi: {csi}')
-        return self
+    def do_csi(self, csi):
+        csi_func = self.get_csi_func(csi.csi_type)
+
+        if csi_func is None:
+            print(f'Unhandled csi: {csi}')
+            return self
+
+        return csi_func(*csi.args)
 
     def parse_csi(self):
         self.next_char_mode = NextCharMode.CHAR
