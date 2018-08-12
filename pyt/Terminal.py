@@ -8,6 +8,8 @@ from .UnicodeBuffer import UnicodeBuffer
 
 __all__ = 'Terminal',
 
+INFINITY = float('inf')
+
 
 def empty_matrix(rows, columns, obj=None):
     row = [obj] * columns
@@ -127,6 +129,87 @@ class Terminal:
         self.screen[self.cursor] = code_point
         return self.cursor_forward()
 
+    def erase_character(self, n_chars_plus_one=None):
+        if n_chars_plus_one is None:
+            n_chars_plus_one = 1
+
+        n_chars = n_chars_plus_one - 1
+        current_x, current_y = self.cursor
+        deleted_keys = []
+
+        for key in self.screen.keys():
+            x, y = key
+
+            if y == current_y and 0 <= x - current_x <= n_chars:
+                deleted_keys.append(key)
+
+        for key in deleted_keys:
+            self.screen.pop(key)
+
+        return self
+
+    def erase_in_line(self, selection=None):
+        if selection is None:
+            selection = 0
+
+        current_x, current_y = self.cursor
+        deleted_keys = []
+
+        if selection == 0:
+            start = current_x
+            end = INFINITY
+        elif selection == 1:
+            start = 0
+            end = current_x
+        elif selection == 2:
+            start = 0
+            end = INFINITY
+
+        for key in self.screen.keys():
+            x, y = key
+
+            if y == current_y and start <= x <= end:
+                deleted_keys.append(key)
+
+        for key in deleted_keys:
+            self.screen.pop(key)
+
+        return self
+
+    def erase_in_page(self, selection=None):
+        if selection is None:
+            selection = 0
+
+        current_x, current_y = self.cursor
+        deleted_keys = []
+
+        if selection == 0:
+            x_min = current_x
+            x_max = INFINITY
+            y_min = current_y
+            y_max = INFINITY
+        elif selection == 1:
+            x_min = 0
+            x_max = current_x
+            y_min = 0
+            y_max = current_y
+        elif selection == 2:
+            x_min = 0
+            x_max = INFINITY
+            y_min = 0
+            y_max = INFINITY
+
+        for key in self.screen.keys():
+            x, y = key
+
+            if y_min < y < y_max or (y == current_y and x_min <= x <= x_max):
+                deleted_keys.append(key)
+
+        for key in deleted_keys:
+            self.screen.pop(key)
+
+        return self
+
     def reset(self):
         return type(self)()
 
@@ -215,6 +298,12 @@ class Terminal:
             return self.cursor_character_absolute(*csi.args)
         elif csi.csi_type is control_codes.CSI.CUP:
             return self.cursor_position(*csi.args)
+        elif csi.csi_type is control_codes.CSI.ECH:
+            return self.erase_character(*csi.args)
+        elif csi.csi_type is control_codes.CSI.ED:
+            return self.erase_in_page(*csi.args)
+        elif csi.csi_type is control_codes.CSI.EL:
+            return self.erase_in_line(*csi.args)
 
         print(f'Unhandled csi: {csi}')
         return self
