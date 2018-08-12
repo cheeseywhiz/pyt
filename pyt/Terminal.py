@@ -319,7 +319,10 @@ class Terminal:
 
     def handle_csi(self, code_point):
         if code_point in range(0x20, 0x30):
-            print('Ignoring intermediate byte (%s)' % hex(code_point))
+            print('Skipping control sequence with intermediate byte '
+                  '(%s)' % hex(code_point))
+            self.next_char_mode = NextCharMode.CHAR
+            return self.reset_csi_buffer()
 
         final_byte = control_codes.CSI(code_point)
 
