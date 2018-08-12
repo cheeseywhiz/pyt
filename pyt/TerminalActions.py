@@ -1,6 +1,6 @@
-__all__ = 'TerminalActions',
+import math
 
-INFINITY = float('inf')
+__all__ = 'TerminalActions',
 
 
 class TerminalActions:
@@ -105,13 +105,13 @@ class TerminalActions:
 
         if selection == 0:
             start = current_x
-            end = INFINITY
+            end = math.inf
         elif selection == 1:
             start = 0
             end = current_x
         elif selection == 2:
             start = 0
-            end = INFINITY
+            end = math.inf
 
         for key in self.screen.keys():
             x, y = key
@@ -133,9 +133,9 @@ class TerminalActions:
 
         if selection == 0:
             x_min = current_x
-            x_max = INFINITY
+            x_max = math.inf
             y_min = current_y
-            y_max = INFINITY
+            y_max = math.inf
         elif selection == 1:
             x_min = 0
             x_max = current_x
@@ -143,9 +143,9 @@ class TerminalActions:
             y_max = current_y
         elif selection == 2:
             x_min = 0
-            x_max = INFINITY
+            x_max = math.inf
             y_min = 0
-            y_max = INFINITY
+            y_max = math.inf
 
         for key in self.screen.keys():
             x, y = key
