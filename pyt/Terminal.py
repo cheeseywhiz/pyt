@@ -137,6 +137,12 @@ class Terminal(TerminalActions):
             return self.erase_in_page(*csi.args)
         elif csi.csi_type is control_codes.CSI.EL:
             return self.erase_in_line(*csi.args)
+        elif csi.csi_type is control_codes.CSI.VPA:
+            return self.line_position_absolute(*csi.args)
+        elif csi.csi_type is control_codes.CSI.VPB:
+            return self.line_position_backwards(*csi.args)
+        elif csi.csi_type is control_codes.CSI.VPR:
+            return self.line_position_forwards(*csi.args)
 
         print(f'Unhandled csi: {csi}')
         return self

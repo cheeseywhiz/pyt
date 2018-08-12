@@ -158,6 +158,30 @@ class TerminalActions:
 
         return self
 
+    def line_position_absolute(self, nth_line=None):
+        if nth_line is None:
+            nth_line = 1
+
+        x, y = self.cursor
+        self.cursor = x, nth_line
+        return self
+
+    def line_position_backwards(self, n_lines=None):
+        if n_lines is None:
+            n_lines = 1
+
+        x, y = self.cursor
+        self.cursor = x, y + n_lines
+        return self
+
+    def line_position_forwards(self, n_lines=None):
+        if n_lines is None:
+            n_lines = 1
+
+        x, y = self.cursor
+        self.cursor = x, y - n_lines
+        return self
+
     def reset(self):
         return type(self)()
 
