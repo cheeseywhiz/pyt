@@ -81,6 +81,9 @@ class Terminal(TerminalActions):
         self.next_char_mode = NextCharMode.CHAR
         return self
 
+    def ignore_sgr(self, *args):
+        return self
+
     def get_csi_func(self, csi_type):
         return {
             control_codes.CSI.CUU: self.cursor_up,
@@ -97,6 +100,7 @@ class Terminal(TerminalActions):
             control_codes.CSI.VPA: self.line_position_absolute,
             control_codes.CSI.VPB: self.line_position_backwards,
             control_codes.CSI.VPR: self.line_position_forwards,
+            control_codes.CSI.SGR: self.ignore_sgr,  # TODO
         }.get(csi_type)
 
     def do_csi(self, csi):

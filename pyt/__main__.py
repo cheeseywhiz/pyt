@@ -9,7 +9,6 @@ class TerminalStore(redux.Store):
     def __init__(self):
         super().__init__(Terminal())
         self.subscribe_print_state()
-        self.print_state()
 
     def print_state(self):
         print(self.state)
