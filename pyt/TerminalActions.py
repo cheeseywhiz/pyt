@@ -21,40 +21,35 @@ class TerminalActions(TerminalBase):
         if n_lines is None:
             n_lines = 1
 
-        x, y = self.cursor
-        self.cursor = x, y - n_lines
+        self.cursor = self.cursor.replace(y=self.cursor.y - n_lines)
         return self
 
     def cursor_down(self, n_lines=None):
         if n_lines is None:
             n_lines = 1
 
-        x, y = self.cursor
-        self.cursor = x, y + n_lines
+        self.cursor = self.cursor.replace(y=self.cursor.y + n_lines)
         return self
 
     def cursor_forward(self, n_cols=None):
         if n_cols is None:
             n_cols = 1
 
-        x, y = self.cursor
-        self.cursor = x + n_cols, y
+        self.cursor = self.cursor.replace(x=self.cursor.x + n_cols)
         return self
 
     def cursor_backward(self, n_cols=None):
         if n_cols is None:
             n_cols = 1
 
-        x, y = self.cursor
-        self.cursor = x - n_cols, y
+        self.cursor = self.cursor.replace(x=self.cursor.x - n_cols)
         return self
 
     def cursor_character_absolute(self, nth_col=None):
         if nth_col is None:
             nth_col = 1
 
-        x, y = self.cursor
-        self.cursor = nth_col - 1, y
+        self.cursor = self.cursor.replace(x=nth_col - 1)
         return self
 
     def cursor_next_line(self, n_lines=None):
@@ -74,7 +69,7 @@ class TerminalActions(TerminalBase):
         if nth_col is None:
             nth_col = 1
 
-        self.cursor = nth_col - 1, nth_line - 1
+        self.cursor = self.cursor.replace(x=nth_col - 1, y=nth_line - 1)
         return self
 
     def backspace(self):
@@ -95,14 +90,12 @@ class TerminalActions(TerminalBase):
             n_chars_plus_one = 1
 
         n_chars = n_chars_plus_one - 1
-        current_x, current_y = self.cursor
         deleted_keys = []
 
-        for key in self.screen.keys():
-            x, y = key
-
-            if y == current_y and 0 <= x - current_x <= n_chars:
-                deleted_keys.append(key)
+        for cursor in self.screen.keys():
+            if cursor.y == self.cursor.y \
+                    and 0 <= cursor.x - self.cursor.x <= n_chars:
+                deleted_keys.append(cursor)
 
         for key in deleted_keys:
             self.screen.pop(key)
@@ -113,24 +106,21 @@ class TerminalActions(TerminalBase):
         if selection is None:
             selection = 0
 
-        current_x, current_y = self.cursor
         deleted_keys = []
 
         if selection == 0:
-            start = current_x
+            start = self.cursor.x
             end = math.inf
         elif selection == 1:
             start = 0
-            end = current_x
+            end = self.cursor.x
         elif selection == 2:
             start = 0
             end = math.inf
 
-        for key in self.screen.keys():
-            x, y = key
-
-            if y == current_y and start <= x <= end:
-                deleted_keys.append(key)
+        for cursor in self.screen.keys():
+            if cursor.y == self.cursor.y and start <= cursor.x <= end:
+                deleted_keys.append(cursor)
 
         for key in deleted_keys:
             self.screen.pop(key)
@@ -141,30 +131,28 @@ class TerminalActions(TerminalBase):
         if selection is None:
             selection = 0
 
-        current_x, current_y = self.cursor
         deleted_keys = []
 
         if selection == 0:
-            x_min = current_x
+            x_min = self.cursor.x
             x_max = math.inf
-            y_min = current_y
+            y_min = self.cursor.y
             y_max = math.inf
         elif selection == 1:
             x_min = 0
-            x_max = current_x
+            x_max = self.cursor.x
             y_min = 0
-            y_max = current_y
+            y_max = self.cursor.y
         elif selection == 2:
             x_min = 0
             x_max = math.inf
             y_min = 0
             y_max = math.inf
 
-        for key in self.screen.keys():
-            x, y = key
-
-            if y_min < y < y_max or (y == current_y and x_min <= x <= x_max):
-                deleted_keys.append(key)
+        for cursor in self.screen.keys():
+            if (cursor.y == self.cursor.y and x_min <= cursor.x <= x_max) \
+                    or y_min < cursor.y < y_max:
+                deleted_keys.append(cursor)
 
         for key in deleted_keys:
             self.screen.pop(key)
@@ -175,22 +163,19 @@ class TerminalActions(TerminalBase):
         if nth_line is None:
             nth_line = 1
 
-        x, y = self.cursor
-        self.cursor = x, nth_line
+        self.cursor = self.cursor.replace(y=nth_line - 1)
         return self
 
     def line_position_backwards(self, n_lines=None):
         if n_lines is None:
             n_lines = 1
 
-        x, y = self.cursor
-        self.cursor = x, y + n_lines
+        self.cursor = self.cursor.replace(self.cursor.y + n_lines)
         return self
 
     def line_position_forwards(self, n_lines=None):
         if n_lines is None:
             n_lines = 1
 
-        x, y = self.cursor
-        self.cursor = x, y - n_lines
+        self.cursor = self.cursor.replace(self.cursor.y - n_lines)
         return self

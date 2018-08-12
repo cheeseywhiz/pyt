@@ -229,11 +229,11 @@ class Terminal(TerminalActions):
         height = 56
         screen = empty_matrix(height, width, ord(' '))
 
-        for (x, y), code_point in self.screen.items():
-            if x >= width or y >= height:
+        for cursor, code_point in self.screen.items():
+            if cursor.x >= width or cursor.y >= height:
                 continue
 
-            screen[y][x] = code_point
+            screen[cursor.y][cursor.x] = code_point
 
         return '\n'.join(''.join(map(chr, row)) for row in screen)
 

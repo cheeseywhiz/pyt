@@ -7,20 +7,30 @@ from .NextCharMode import NextCharMode
 __all__ = 'TerminalBase',
 
 
-CursorT = typing.Tuple[int, int]
+@dataclasses.dataclass(frozen=True)
+class FrozenBase:
+    def replace(self, **changes):
+        return dataclasses.replace(self, **changes)
+
+
+@dataclasses.dataclass(frozen=True)
+class Cursor(FrozenBase):
+    x: int = 0
+    y: int = 0
 
 
 @dataclasses.dataclass
 class TerminalBase:
-    screen: typing.Dict[CursorT, int] = dataclasses.field(
-        default_factory=dict, repr=False,
+    screen: typing.Dict[Cursor, int] = dataclasses.field(
+        default_factory=dict,
+        # repr=False,
     )
     unicode_buffer: UnicodeBuffer = UnicodeBuffer()
     next_char_mode: NextCharMode = NextCharMode.CHAR
     string_type: control_codes.C1_7B = None
     string_buffer: typing.List[int] = None
     csi_buffer: typing.List[int] = None
-    cursor: CursorT = (0, 0)
+    cursor: Cursor = Cursor()
     set_char_set_selection: int = None
 
     def copy(self):
