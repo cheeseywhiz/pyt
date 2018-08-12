@@ -67,10 +67,10 @@ class C0(HexIntEnum):
 
 class C1_7B(HexIntEnum):
     # Set charset
-    CS1 = 0x28  # (
-    CS2 = 0x29  # )
-    CS3 = 0x2a  # *
-    CS4 = 0x2b  # +
+    CS0 = 0x28  # (
+    CS1 = 0x29  # )
+    CS2 = 0x2a  # *
+    CS3 = 0x2b  # +
 
     PAM = 0x3d  # =  # Application keypad
     PNM = 0x3e  # >  # Numeric keypad

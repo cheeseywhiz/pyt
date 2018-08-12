@@ -27,6 +27,7 @@ class NextCharMode(StrEnum):
     CSI = enum.auto()
     STRING = enum.auto()
     STRING_ESC = enum.auto()
+    SET_CHAR_SET = enum.auto()
 
 
 CursorT = typing.Tuple[int, int]
@@ -43,6 +44,7 @@ class Terminal(TerminalActions):
     string_buffer: typing.List[int] = None
     csi_buffer: typing.List[int] = None
     cursor: CursorT = (0, 0)
+    set_char_set_selection: int = None
 
     def copy(self):
         return type(self)(
@@ -53,6 +55,7 @@ class Terminal(TerminalActions):
             None if self.string_buffer is None else self.string_buffer[:],
             None if self.csi_buffer is None else self.csi_buffer[:],
             self.cursor,
+            self.set_char_set_selection,
         )
 
     def handle_C0(self, C0):
@@ -92,6 +95,15 @@ class Terminal(TerminalActions):
             return self.add_newline()
         elif C1 is control_codes.C1_7B.RIS:
             return self.reset()
+        elif C1 in (
+                control_codes.C1_7B.CS0,
+                control_codes.C1_7B.CS1,
+                control_codes.C1_7B.CS2,
+                control_codes.C1_7B.CS3,
+        ):
+            self.set_char_set_selection = C1
+            self.next_char_mode = NextCharMode.SET_CHAR_SET
+            return self
 
         print(f'Unhandled C1: {C1 !r}')
         return self
@@ -216,6 +228,13 @@ class Terminal(TerminalActions):
                 .reset_string_buffer() \
                 .handle_esc()
 
+    def handle_set_char_set(self, code_point):
+        print('Ignoring character set setting '
+              f'{self.set_char_set_selection !r} = {hex(code_point)}')
+        self.next_char_mode = NextCharMode.CHAR
+        self.set_char_set_selection = None
+        return self
+
     @property
     def put_char_func(self):
         return {
@@ -224,6 +243,7 @@ class Terminal(TerminalActions):
             NextCharMode.CSI: self.handle_csi,
             NextCharMode.STRING: self.handle_string,
             NextCharMode.STRING_ESC: self.handle_string_esc,
+            NextCharMode.SET_CHAR_SET: self.handle_set_char_set,
         }[self.next_char_mode]
 
     def put_code_point(self, code_point):
