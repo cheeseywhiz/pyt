@@ -1,11 +1,8 @@
-import dataclasses
-import typing
-import enum
 from . import actions
 from . import control_codes
-from .ParsedCSI import ParsedCSI
-from .UnicodeBuffer import UnicodeBuffer
 from .TerminalActions import TerminalActions
+from .ParsedCSI import ParsedCSI
+from .NextCharMode import NextCharMode
 
 __all__ = 'Terminal',
 
@@ -15,49 +12,7 @@ def empty_matrix(rows, columns, obj=None):
     return [row[:] for _ in range(rows)]
 
 
-class StrEnum(enum.Enum):
-    # https://docs.python.org/3/library/enum.html#using-automatic-values
-    def _generate_next_value_(name, start, count, last_values):
-        return name
-
-
-class NextCharMode(StrEnum):
-    CHAR = enum.auto()
-    ESC = enum.auto()
-    CSI = enum.auto()
-    STRING = enum.auto()
-    STRING_ESC = enum.auto()
-    SET_CHAR_SET = enum.auto()
-
-
-CursorT = typing.Tuple[int, int]
-
-
-@dataclasses.dataclass
 class Terminal(TerminalActions):
-    screen: typing.Dict[CursorT, int] = dataclasses.field(
-        default_factory=dict, repr=False,
-    )
-    unicode_buffer: UnicodeBuffer = UnicodeBuffer()
-    next_char_mode: NextCharMode = NextCharMode.CHAR
-    string_type: control_codes.C1_7B = None
-    string_buffer: typing.List[int] = None
-    csi_buffer: typing.List[int] = None
-    cursor: CursorT = (0, 0)
-    set_char_set_selection: int = None
-
-    def copy(self):
-        return type(self)(
-            self.screen.copy(),
-            self.unicode_buffer.copy(),
-            self.next_char_mode,
-            self.string_type,
-            None if self.string_buffer is None else self.string_buffer[:],
-            None if self.csi_buffer is None else self.csi_buffer[:],
-            self.cursor,
-            self.set_char_set_selection,
-        )
-
     def handle_C0(self, C0):
         if C0 is control_codes.C0.BS:
             return self.backspace()

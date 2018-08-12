@@ -1,9 +1,22 @@
 import math
+from .TerminalBase import TerminalBase
 
 __all__ = 'TerminalActions',
 
 
-class TerminalActions:
+class TerminalActions(TerminalBase):
+    def reset(self):
+        return type(self)()
+
+    def reset_string_buffer(self, string_type=None):
+        self.string_buffer = []
+        self.string_type = string_type
+        return self
+
+    def reset_csi_buffer(self):
+        self.csi_buffer = []
+        return self
+
     def cursor_up(self, n_lines=None):
         if n_lines is None:
             n_lines = 1
@@ -180,16 +193,4 @@ class TerminalActions:
 
         x, y = self.cursor
         self.cursor = x, y - n_lines
-        return self
-
-    def reset(self):
-        return type(self)()
-
-    def reset_string_buffer(self, string_type=None):
-        self.string_buffer = []
-        self.string_type = string_type
-        return self
-
-    def reset_csi_buffer(self):
-        self.csi_buffer = []
         return self
