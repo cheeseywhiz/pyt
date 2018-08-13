@@ -89,6 +89,14 @@ class TerminalActions(TerminalBase):
     def line_feed(self):
         return self.cursor_next_line()
 
+    def character_tabulation(self):
+        next_tab = self.next_tab
+
+        if next_tab is None:
+            return self.line_feed()
+
+        return self.update_cursor(x=self.next_tab)
+
     def add_char(self, code_point):
         self.screen[self.cursor] = code_point
         return self.cursor_forward()

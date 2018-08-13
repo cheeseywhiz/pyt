@@ -1,8 +1,10 @@
 import dataclasses
 import typing
+from . import config
 from . import control_codes
 from .UnicodeBuffer import UnicodeBuffer
 from .NextCharMode import NextCharMode
+from .Tabs import Tabs
 
 __all__ = 'TerminalBase',
 
@@ -32,6 +34,7 @@ class TerminalBase:
     csi_buffer: typing.List[int] = None
     cursor: Cursor = Cursor()
     set_char_set_selection: int = None
+    tabs: Tabs = Tabs.from_config()
 
     def copy(self):
         return type(self)(
@@ -43,4 +46,12 @@ class TerminalBase:
             None if self.csi_buffer is None else self.csi_buffer[:],
             self.cursor,
             self.set_char_set_selection,
+            self.tabs.copy(),
         )
+
+    @property
+    def next_tab(self):
+        if self.cursor.x == config.width - 1:
+            return config.width - 1
+
+        return self.tabs.next_tab(self.cursor.x)

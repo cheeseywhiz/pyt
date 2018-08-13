@@ -1,4 +1,5 @@
 from . import actions
+from . import config
 from . import control_codes
 from .TerminalActions import TerminalActions
 from .ParsedCSI import ParsedCSI
@@ -27,6 +28,8 @@ class Terminal(TerminalActions):
         elif C0 is control_codes.C0.ESC:
             self.next_char_mode = NextCharMode.ESC
             return self
+        elif C0 is control_codes.C0.HT:
+            return self.character_tabulation()
 
         print(f'Unhandled C0: {C0 !r}')
         return self
@@ -223,8 +226,8 @@ class Terminal(TerminalActions):
 
     @property
     def screen_str(self):
-        width = 227
-        height = 56
+        width = config.width
+        height = config.height
         screen = empty_matrix(height, width, ord(' '))
 
         for cursor, code_point in self.screen.items():
