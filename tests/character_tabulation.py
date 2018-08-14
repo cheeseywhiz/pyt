@@ -33,7 +33,7 @@ def test_case(nth_col):
 
 
 def main():
-    for i in range(pyt.config.width - 0):
+    for i in range(pyt.config.width):
         print(test_case(i))
 
 

@@ -1,4 +1,5 @@
 import math
+from . import config
 from .TerminalBase import TerminalBase
 
 __all__ = 'TerminalActions',
@@ -90,12 +91,15 @@ class TerminalActions(TerminalBase):
         return self.cursor_next_line()
 
     def character_tabulation(self):
-        next_tab = self.next_tab
+        if self.cursor.x == config.width - 1:
+            return self
 
-        if next_tab is None:
+        next_tabs = self.tabs.next_tabs(self.cursor.x)
+
+        if not next_tabs:
             return self.line_feed()
 
-        return self.update_cursor(x=self.next_tab)
+        return self.update_cursor(x=next_tabs[0])
 
     def add_char(self, code_point):
         self.screen[self.cursor] = code_point

@@ -30,7 +30,7 @@ class MutableSet(collections.abc.MutableSet):
 
     def __repr__(self):
         qualname = self.__class__.__qualname__
-        return f'{qualname}({list(self) !r})'
+        return f'{qualname}({sorted(self) !r})'
 
 
 class Tabs(MutableSet):
@@ -46,10 +46,5 @@ class Tabs(MutableSet):
         self.add(width - 1)
         return self
 
-    def __iter__(self):
-        return iter(sorted(super().__iter__()))
-
-    def next_tab(self, after):
-        for tab in self:
-            if after < tab:
-                return tab
+    def next_tabs(self, after):
+        return sorted(filter(lambda tab: tab > after, self))

@@ -228,6 +228,10 @@ class Terminal(TerminalActions):
     def screen_str(self):
         width = config.width
         height = config.height
+        height = max(
+            (cursor.y for cursor in self.screen.keys()),
+            default=height - 1,
+        ) + 1
         screen = empty_matrix(height, width, ord(' '))
 
         for cursor, code_point in self.screen.items():

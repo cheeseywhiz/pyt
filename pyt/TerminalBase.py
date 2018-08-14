@@ -48,10 +48,3 @@ class TerminalBase:
             self.set_char_set_selection,
             self.tabs.copy(),
         )
-
-    @property
-    def next_tab(self):
-        if self.cursor.x == config.width - 1:
-            return config.width - 1
-
-        return self.tabs.next_tab(self.cursor.x)

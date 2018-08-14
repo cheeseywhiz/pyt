@@ -1,6 +1,6 @@
-Script started on 2018-08-12 22:40:36-04:00
-[1;32mcheese[0m: 10:40:37 PM: [1;34mpyt[0m (master)
-$ ]0;cheese: 10:40:37 PM: pyt (master)\python tests/character_tabulation.py; exit
+Script started on 2018-08-13 23:51:05-04:00
+]0;cheese@ArchLinux:~/pyt[1;32mcheese[0m: 11:51:06 PM: [1;34mpyt[0m (master)
+$ ]0;cheese: 11:51:06 PM: pyt (master)\python tests/character_tabulation.py ; exit
 [1Ga	b
 [2Ga	b
 [3Ga	b
@@ -230,4 +230,4 @@ $ ]0;cheese: 10:40:37 PM: pyt (master)\python tests/character_tabulation.py; e
 [227Ga	b
 exit
 
-Script done on 2018-08-12 22:40:38-04:00
+Script done on 2018-08-13 23:51:07-04:00
