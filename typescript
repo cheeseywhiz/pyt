@@ -1,233 +1,310 @@
-Script started on 2018-08-13 23:51:05-04:00
-]0;cheese@ArchLinux:~/pyt[1;32mcheese[0m: 11:51:06 PM: [1;34mpyt[0m (master)
-$ ]0;cheese: 11:51:06 PM: pyt (master)\python tests/character_tabulation.py ; exit
-[1Ga	b
-[2Ga	b
-[3Ga	b
-[4Ga	b
-[5Ga	b
-[6Ga	b
-[7Ga	b
-[8Ga	b
-[9Ga	b
-[10Ga	b
-[11Ga	b
-[12Ga	b
-[13Ga	b
-[14Ga	b
-[15Ga	b
-[16Ga	b
-[17Ga	b
-[18Ga	b
-[19Ga	b
-[20Ga	b
-[21Ga	b
-[22Ga	b
-[23Ga	b
-[24Ga	b
-[25Ga	b
-[26Ga	b
-[27Ga	b
-[28Ga	b
-[29Ga	b
-[30Ga	b
-[31Ga	b
-[32Ga	b
-[33Ga	b
-[34Ga	b
-[35Ga	b
-[36Ga	b
-[37Ga	b
-[38Ga	b
-[39Ga	b
-[40Ga	b
-[41Ga	b
-[42Ga	b
-[43Ga	b
-[44Ga	b
-[45Ga	b
-[46Ga	b
-[47Ga	b
-[48Ga	b
-[49Ga	b
-[50Ga	b
-[51Ga	b
-[52Ga	b
-[53Ga	b
-[54Ga	b
-[55Ga	b
-[56Ga	b
-[57Ga	b
-[58Ga	b
-[59Ga	b
-[60Ga	b
-[61Ga	b
-[62Ga	b
-[63Ga	b
-[64Ga	b
-[65Ga	b
-[66Ga	b
-[67Ga	b
-[68Ga	b
-[69Ga	b
-[70Ga	b
-[71Ga	b
-[72Ga	b
-[73Ga	b
-[74Ga	b
-[75Ga	b
-[76Ga	b
-[77Ga	b
-[78Ga	b
-[79Ga	b
-[80Ga	b
-[81Ga	b
-[82Ga	b
-[83Ga	b
-[84Ga	b
-[85Ga	b
-[86Ga	b
-[87Ga	b
-[88Ga	b
-[89Ga	b
-[90Ga	b
-[91Ga	b
-[92Ga	b
-[93Ga	b
-[94Ga	b
-[95Ga	b
-[96Ga	b
-[97Ga	b
-[98Ga	b
-[99Ga	b
-[100Ga	b
-[101Ga	b
-[102Ga	b
-[103Ga	b
-[104Ga	b
-[105Ga	b
-[106Ga	b
-[107Ga	b
-[108Ga	b
-[109Ga	b
-[110Ga	b
-[111Ga	b
-[112Ga	b
-[113Ga	b
-[114Ga	b
-[115Ga	b
-[116Ga	b
-[117Ga	b
-[118Ga	b
-[119Ga	b
-[120Ga	b
-[121Ga	b
-[122Ga	b
-[123Ga	b
-[124Ga	b
-[125Ga	b
-[126Ga	b
-[127Ga	b
-[128Ga	b
-[129Ga	b
-[130Ga	b
-[131Ga	b
-[132Ga	b
-[133Ga	b
-[134Ga	b
-[135Ga	b
-[136Ga	b
-[137Ga	b
-[138Ga	b
-[139Ga	b
-[140Ga	b
-[141Ga	b
-[142Ga	b
-[143Ga	b
-[144Ga	b
-[145Ga	b
-[146Ga	b
-[147Ga	b
-[148Ga	b
-[149Ga	b
-[150Ga	b
-[151Ga	b
-[152Ga	b
-[153Ga	b
-[154Ga	b
-[155Ga	b
-[156Ga	b
-[157Ga	b
-[158Ga	b
-[159Ga	b
-[160Ga	b
-[161Ga	b
-[162Ga	b
-[163Ga	b
-[164Ga	b
-[165Ga	b
-[166Ga	b
-[167Ga	b
-[168Ga	b
-[169Ga	b
-[170Ga	b
-[171Ga	b
-[172Ga	b
-[173Ga	b
-[174Ga	b
-[175Ga	b
-[176Ga	b
-[177Ga	b
-[178Ga	b
-[179Ga	b
-[180Ga	b
-[181Ga	b
-[182Ga	b
-[183Ga	b
-[184Ga	b
-[185Ga	b
-[186Ga	b
-[187Ga	b
-[188Ga	b
-[189Ga	b
-[190Ga	b
-[191Ga	b
-[192Ga	b
-[193Ga	b
-[194Ga	b
-[195Ga	b
-[196Ga	b
-[197Ga	b
-[198Ga	b
-[199Ga	b
-[200Ga	b
-[201Ga	b
-[202Ga	b
-[203Ga	b
-[204Ga	b
-[205Ga	b
-[206Ga	b
-[207Ga	b
-[208Ga	b
-[209Ga	b
-[210Ga	b
-[211Ga	b
-[212Ga	b
-[213Ga	b
-[214Ga	b
-[215Ga	b
-[216Ga	b
-[217Ga	b
-[218Ga	b
-[219Ga	b
-[220Ga	b
-[221Ga	b
-[222Ga	b
-[223Ga	b
-[224Ga	b
-[225Ga	b
-[226Ga	b
-[227Ga	b
+Script started on 2018-08-21 11:11:26-04:00
+]0;cheese@ArchLinux:~/pyt[1;32mcheese[0m: 11:11:27 AM: [1;34mpyt[0m (master)
+$ ]0;cheese: 11:11:27 AM: pyt (master)\python tests/cursor_forward_tabulation.py; exit
+[220Ga[0Ib
+[220Ga[1Ib
+[220Ga[2Ib
+[220Ga[3Ib
+[220Ga[4Ib
+[220Ga[5Ib
+[220Ga[6Ib
+[220Ga[7Ib
+[220Ga[8Ib
+[220Ga[9Ib
+[220Ga[10Ib
+[220Ga[11Ib
+[220Ga[12Ib
+[220Ga[13Ib
+[220Ga[14Ib
+[220Ga[15Ib
+[220Ga[16Ib
+[220Ga[17Ib
+[220Ga[18Ib
+[220Ga[19Ib
+[220Ga[20Ib
+[220Ga[21Ib
+[220Ga[22Ib
+[220Ga[23Ib
+[220Ga[24Ib
+[220Ga[25Ib
+[220Ga[26Ib
+[220Ga[27Ib
+[220Ga[28Ib
+[220Ga[29Ib
+[220Ga[30Ib
+[220Ga[31Ib
+[220Ga[32Ib
+[220Ga[33Ib
+[220Ga[34Ib
+[220Ga[35Ib
+[220Ga[36Ib
+[220Ga[37Ib
+[221Ga[0Ib
+[221Ga[1Ib
+[221Ga[2Ib
+[221Ga[3Ib
+[221Ga[4Ib
+[221Ga[5Ib
+[221Ga[6Ib
+[221Ga[7Ib
+[221Ga[8Ib
+[221Ga[9Ib
+[221Ga[10Ib
+[221Ga[11Ib
+[221Ga[12Ib
+[221Ga[13Ib
+[221Ga[14Ib
+[221Ga[15Ib
+[221Ga[16Ib
+[221Ga[17Ib
+[221Ga[18Ib
+[221Ga[19Ib
+[221Ga[20Ib
+[221Ga[21Ib
+[221Ga[22Ib
+[221Ga[23Ib
+[221Ga[24Ib
+[221Ga[25Ib
+[221Ga[26Ib
+[221Ga[27Ib
+[221Ga[28Ib
+[221Ga[29Ib
+[221Ga[30Ib
+[221Ga[31Ib
+[221Ga[32Ib
+[221Ga[33Ib
+[221Ga[34Ib
+[221Ga[35Ib
+[221Ga[36Ib
+[221Ga[37Ib
+[222Ga[0Ib
+[222Ga[1Ib
+[222Ga[2Ib
+[222Ga[3Ib
+[222Ga[4Ib
+[222Ga[5Ib
+[222Ga[6Ib
+[222Ga[7Ib
+[222Ga[8Ib
+[222Ga[9Ib
+[222Ga[10Ib
+[222Ga[11Ib
+[222Ga[12Ib
+[222Ga[13Ib
+[222Ga[14Ib
+[222Ga[15Ib
+[222Ga[16Ib
+[222Ga[17Ib
+[222Ga[18Ib
+[222Ga[19Ib
+[222Ga[20Ib
+[222Ga[21Ib
+[222Ga[22Ib
+[222Ga[23Ib
+[222Ga[24Ib
+[222Ga[25Ib
+[222Ga[26Ib
+[222Ga[27Ib
+[222Ga[28Ib
+[222Ga[29Ib
+[222Ga[30Ib
+[222Ga[31Ib
+[222Ga[32Ib
+[222Ga[33Ib
+[222Ga[34Ib
+[222Ga[35Ib
+[222Ga[36Ib
+[222Ga[37Ib
+[223Ga[0Ib
+[223Ga[1Ib
+[223Ga[2Ib
+[223Ga[3Ib
+[223Ga[4Ib
+[223Ga[5Ib
+[223Ga[6Ib
+[223Ga[7Ib
+[223Ga[8Ib
+[223Ga[9Ib
+[223Ga[10Ib
+[223Ga[11Ib
+[223Ga[12Ib
+[223Ga[13Ib
+[223Ga[14Ib
+[223Ga[15Ib
+[223Ga[16Ib
+[223Ga[17Ib
+[223Ga[18Ib
+[223Ga[19Ib
+[223Ga[20Ib
+[223Ga[21Ib
+[223Ga[22Ib
+[223Ga[23Ib
+[223Ga[24Ib
+[223Ga[25Ib
+[223Ga[26Ib
+[223Ga[27Ib
+[223Ga[28Ib
+[223Ga[29Ib
+[223Ga[30Ib
+[223Ga[31Ib
+[223Ga[32Ib
+[223Ga[33Ib
+[223Ga[34Ib
+[223Ga[35Ib
+[223Ga[36Ib
+[223Ga[37Ib
+[224Ga[0Ib
+[224Ga[1Ib
+[224Ga[2Ib
+[224Ga[3Ib
+[224Ga[4Ib
+[224Ga[5Ib
+[224Ga[6Ib
+[224Ga[7Ib
+[224Ga[8Ib
+[224Ga[9Ib
+[224Ga[10Ib
+[224Ga[11Ib
+[224Ga[12Ib
+[224Ga[13Ib
+[224Ga[14Ib
+[224Ga[15Ib
+[224Ga[16Ib
+[224Ga[17Ib
+[224Ga[18Ib
+[224Ga[19Ib
+[224Ga[20Ib
+[224Ga[21Ib
+[224Ga[22Ib
+[224Ga[23Ib
+[224Ga[24Ib
+[224Ga[25Ib
+[224Ga[26Ib
+[224Ga[27Ib
+[224Ga[28Ib
+[224Ga[29Ib
+[224Ga[30Ib
+[224Ga[31Ib
+[224Ga[32Ib
+[224Ga[33Ib
+[224Ga[34Ib
+[224Ga[35Ib
+[224Ga[36Ib
+[224Ga[37Ib
+[225Ga[0Ib
+[225Ga[1Ib
+[225Ga[2Ib
+[225Ga[3Ib
+[225Ga[4Ib
+[225Ga[5Ib
+[225Ga[6Ib
+[225Ga[7Ib
+[225Ga[8Ib
+[225Ga[9Ib
+[225Ga[10Ib
+[225Ga[11Ib
+[225Ga[12Ib
+[225Ga[13Ib
+[225Ga[14Ib
+[225Ga[15Ib
+[225Ga[16Ib
+[225Ga[17Ib
+[225Ga[18Ib
+[225Ga[19Ib
+[225Ga[20Ib
+[225Ga[21Ib
+[225Ga[22Ib
+[225Ga[23Ib
+[225Ga[24Ib
+[225Ga[25Ib
+[225Ga[26Ib
+[225Ga[27Ib
+[225Ga[28Ib
+[225Ga[29Ib
+[225Ga[30Ib
+[225Ga[31Ib
+[225Ga[32Ib
+[225Ga[33Ib
+[225Ga[34Ib
+[225Ga[35Ib
+[225Ga[36Ib
+[225Ga[37Ib
+[226Ga[0Ib
+[226Ga[1Ib
+[226Ga[2Ib
+[226Ga[3Ib
+[226Ga[4Ib
+[226Ga[5Ib
+[226Ga[6Ib
+[226Ga[7Ib
+[226Ga[8Ib
+[226Ga[9Ib
+[226Ga[10Ib
+[226Ga[11Ib
+[226Ga[12Ib
+[226Ga[13Ib
+[226Ga[14Ib
+[226Ga[15Ib
+[226Ga[16Ib
+[226Ga[17Ib
+[226Ga[18Ib
+[226Ga[19Ib
+[226Ga[20Ib
+[226Ga[21Ib
+[226Ga[22Ib
+[226Ga[23Ib
+[226Ga[24Ib
+[226Ga[25Ib
+[226Ga[26Ib
+[226Ga[27Ib
+[226Ga[28Ib
+[226Ga[29Ib
+[226Ga[30Ib
+[226Ga[31Ib
+[226Ga[32Ib
+[226Ga[33Ib
+[226Ga[34Ib
+[226Ga[35Ib
+[226Ga[36Ib
+[226Ga[37Ib
+[227Ga[0Ib
+[227Ga[1Ib
+[227Ga[2Ib
+[227Ga[3Ib
+[227Ga[4Ib
+[227Ga[5Ib
+[227Ga[6Ib
+[227Ga[7Ib
+[227Ga[8Ib
+[227Ga[9Ib
+[227Ga[10Ib
+[227Ga[11Ib
+[227Ga[12Ib
+[227Ga[13Ib
+[227Ga[14Ib
+[227Ga[15Ib
+[227Ga[16Ib
+[227Ga[17Ib
+[227Ga[18Ib
+[227Ga[19Ib
+[227Ga[20Ib
+[227Ga[21Ib
+[227Ga[22Ib
+[227Ga[23Ib
+[227Ga[24Ib
+[227Ga[25Ib
+[227Ga[26Ib
+[227Ga[27Ib
+[227Ga[28Ib
+[227Ga[29Ib
+[227Ga[30Ib
+[227Ga[31Ib
+[227Ga[32Ib
+[227Ga[33Ib
+[227Ga[34Ib
+[227Ga[35Ib
+[227Ga[36Ib
+[227Ga[37Ib
 exit
 
-Script done on 2018-08-13 23:51:07-04:00
+Script done on 2018-08-21 11:11:28-04:00
