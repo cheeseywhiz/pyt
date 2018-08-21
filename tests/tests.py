@@ -1,6 +1,10 @@
 from chars import *
 
 
+def join(*lines):
+    return ''.join(lines)
+
+
 def escape_command(seq):
     return ESC + seq
 

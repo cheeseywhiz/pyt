@@ -1,14 +1,14 @@
 import pyt
-from tests import cursor_forward_tabulation, cursor_character_absolute
+from tests import join, cursor_forward_tabulation, cursor_character_absolute
 
 
 def test_case(n_cols, n_tabs):
-    return ''.join([
+    return join(
         cursor_character_absolute(n_cols),
         'a',
         cursor_forward_tabulation(n_tabs),
         'b',
-    ])
+    )
 
 
 def main():

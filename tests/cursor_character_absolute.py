@@ -1,17 +1,16 @@
 import pyt.config
 from tests import join, cursor_character_absolute
-from chars import HT
 
 
 def test_case(nth_col):
     return join(
         cursor_character_absolute(nth_col),
-        'a', HT, 'b',
+        'a',
     )
 
 
 def main():
-    for i in range(pyt.config.width):
+    for i in range(pyt.config.width + 10):
         print(test_case(i))
 
 
