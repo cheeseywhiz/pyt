@@ -42,9 +42,7 @@ class Tabs(MutableSet):
         if tab_width is None:
             tab_width = pyt.config.tab_width
 
-        self = cls(range(0, width, tab_width))
-        self.add(width - 1)
-        return self
+        return cls(range(0, width, tab_width))
 
     def next_tabs(self, after):
         return sorted(filter(lambda tab: tab > after, self))

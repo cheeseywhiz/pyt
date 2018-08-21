@@ -25,9 +25,14 @@ class TerminalActions(TerminalBase):
 
         if tmp_x < 0:
             tmp_x = 0
+        elif tmp_x > config.width:
+            tmp_x = config.width
 
         if tmp_y < 0:
             tmp_y = 0
+        # TODO: scroll up instead of extending page
+        #elif tmp_y > config.height:
+        #   tmp_y = config.height
 
         self.cursor = tmp_cursor.replace(x=tmp_x, y=tmp_y)
         return self
@@ -91,19 +96,25 @@ class TerminalActions(TerminalBase):
         return self.cursor_next_line()
 
     def character_tabulation(self):
-        if self.cursor.x == config.width - 1:
-            return self
-
-        next_tabs = self.tabs.next_tabs(self.cursor.x)
-
-        if not next_tabs:
+        if self.cursor.x == config.width:
             return self.line_feed()
 
-        return self.update_cursor(x=next_tabs[0])
+        next_tabs = self.tabs.next_tabs(self.cursor.x)
+        next_tab = next_tabs[0] if next_tabs else config.width - 1
+        return self.update_cursor(x=next_tab)
 
-    def add_char(self, code_point):
+    def add_char_impl(self, code_point):
         self.screen[self.cursor] = code_point
         return self.cursor_forward()
+
+    def add_char(self, code_point):
+        if self.cursor.x == config.width:
+            # word-wrap
+            return self \
+                .line_feed() \
+                .add_char_impl(code_point)
+
+        return self.add_char_impl(code_point)
 
     def erase_character(self, n_chars_plus_one=None):
         if n_chars_plus_one is None:
