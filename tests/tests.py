@@ -26,3 +26,14 @@ def cursor_forward_tabulation(n_tabs=None):
         n_tabs = 1
 
     return control_sequence(CHT, n_tabs)
+
+
+def tabuation_clear(selection=None):
+    if selection is None:
+        selection = 0
+
+    return control_sequence(TBC, selection)
+
+
+def character_tabulation_set():
+    return escape_command(HTS)
