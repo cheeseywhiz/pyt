@@ -97,6 +97,7 @@ class Terminal(TerminalActions):
             control_codes.CSI.CPL: self.cursor_preceding_line,
             control_codes.CSI.CHA: self.cursor_character_absolute,
             control_codes.CSI.CUP: self.cursor_position,
+            control_codes.CSI.CHT: self.cursor_forward_tabulation,
             control_codes.CSI.ECH: self.erase_character,
             control_codes.CSI.ED: self.erase_in_page,
             control_codes.CSI.EL: self.erase_in_line,
