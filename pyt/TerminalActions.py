@@ -148,6 +148,8 @@ class TerminalActions(TerminalBase):
         elif selection == 2:
             start = 0
             end = math.inf
+        else:
+            return self
 
         for cursor in self.screen.keys():
             if cursor.y == self.cursor.y and start <= cursor.x <= end:
@@ -179,6 +181,8 @@ class TerminalActions(TerminalBase):
             x_max = math.inf
             y_min = 0
             y_max = math.inf
+        else:
+            return self
 
         for cursor in self.screen.keys():
             if (cursor.y == self.cursor.y and x_min <= cursor.x <= x_max) \
