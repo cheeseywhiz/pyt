@@ -95,14 +95,27 @@ class TerminalActions(TerminalBase):
     def line_feed(self):
         return self.cursor_next_line()
 
+    def horizontal_tabulation_set(self):
+        self.tabs.add(self.cursor.x)
+        return self
+
+    def tabulation_clear(self, selection=None):
+        if selection is None:
+            selection = 0
+
+        if selection == 0:
+            self.tabs.discard(self.cursor.x)
+        elif selection in (3, 5):
+            self.tabs.clear()
+
+        return self
+
     def cursor_forward_tabulation(self, n_tabs=None):
-        if n_tabs is None:
-            n_tabs = 1
-        elif not n_tabs:
+        if n_tabs == 0 or self.cursor.x == config.width:
             return self
 
-        if self.cursor.x == config.width:
-            return self.line_feed()
+        if n_tabs is None:
+            n_tabs = 1
 
         next_tabs = self.tabs.next_tabs(self.cursor.x)
 

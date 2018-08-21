@@ -51,6 +51,8 @@ class Terminal(TerminalActions):
             return self.reset_string_buffer(C1)
         elif C1 is control_codes.C1_7B.NEL:
             return self.add_newline()
+        elif C1 is control_codes.C1_7B.HTS:
+            return self.horizontal_tabulation_set()
         elif C1 is control_codes.C1_7B.RIS:
             return self.reset()
         elif C1 in (
@@ -98,6 +100,7 @@ class Terminal(TerminalActions):
             control_codes.CSI.CHA: self.cursor_character_absolute,
             control_codes.CSI.CUP: self.cursor_position,
             control_codes.CSI.CHT: self.cursor_forward_tabulation,
+            control_codes.CSI.TBC: self.tabulation_clear,
             control_codes.CSI.ECH: self.erase_character,
             control_codes.CSI.ED: self.erase_in_page,
             control_codes.CSI.EL: self.erase_in_line,
