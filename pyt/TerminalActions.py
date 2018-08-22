@@ -30,9 +30,8 @@ class TerminalActions(TerminalBase):
 
         if tmp_y < 0:
             tmp_y = 0
-        # TODO: scroll up instead of extending page
-        #elif tmp_y > config.height:
-        #   tmp_y = config.height
+        elif tmp_y > config.height:
+            tmp_y = config.height
 
         self.cursor = tmp_cursor.replace(x=tmp_x, y=tmp_y)
         return self
@@ -92,7 +91,17 @@ class TerminalActions(TerminalBase):
     def carriage_return(self):
         return self.cursor_character_absolute()
 
+    def line_feed_scroll_up(self):
+        self.screen = {
+            cursor.replace(y=cursor.y - 1): value
+            for cursor, value in self.screen.items()
+        }
+        return self
+
     def line_feed(self):
+        if self.cursor.y == config.height - 1:
+            return self.line_feed_scroll_up()
+
         return self.cursor_next_line()
 
     def horizontal_tabulation_set(self):

@@ -232,17 +232,11 @@ class Terminal(TerminalActions):
     def screen_str(self):
         width = config.width
         height = config.height
-        height = max(
-            (cursor.y for cursor in self.screen.keys()),
-            default=height - 1,
-        ) + 1
         screen = empty_matrix(height, width, ord(' '))
 
         for cursor, code_point in self.screen.items():
-            if cursor.x >= width or cursor.y >= height:
-                continue
-
-            screen[cursor.y][cursor.x] = code_point
+            if 0 <= cursor.x < width and 0 <= cursor.y < height:
+                screen[cursor.y][cursor.x] = code_point
 
         return '\n'.join(''.join(map(chr, row)) for row in screen)
 
