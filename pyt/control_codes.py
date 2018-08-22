@@ -27,7 +27,15 @@ class HexIntEnum(HexInt, enum.Enum, metaclass=EnumMeta):
 DEL = 0x7f
 
 
-class C0(HexIntEnum):
+class C0Meta(EnumMeta):
+    def from_ctrl(self, ctrl_character):
+        # Example:
+        # ^M -> CR
+        # C0.from_ctrl('M') is C0.CR
+        return self(ord(ctrl_character) & 0x1f)
+
+
+class C0(HexIntEnum, metaclass=C0Meta):
     NUL = 0x00
     SOH = 0x01
     STX = 0x02
