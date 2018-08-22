@@ -1,7 +1,10 @@
-Script started on 2018-08-21 23:32:33-04:00
-]0;cheese@ArchLinux:~/pyt[1;32mcheese[0m: 11:32:34 PM: [1;34mpyt[0m (master)
-$ ]0;cheese: 11:32:34 PM: pyt (master)\python tests/line_position_absolute.py; exit
-c[1dhello world[28dmiddle of screen[56dgoodbye world
+Script started on 2018-08-21 23:44:07-04:00
+]0;cheese@ArchLinux:~/pyt[1;32mcheese[0m: 11:44:08 PM: [1;34mpyt[0m (master)
+$ ]0;cheese: 11:44:08 PM: pyt (master)\python tests/line_feed.py; exit
+chello world
+super long text string under hello world[28dmiddle of screen
+second middle line[56dgoodbye world
+second line of bottom[1doverwrite new top line
 exit
 
-Script done on 2018-08-21 23:32:35-04:00
+Script done on 2018-08-21 23:44:10-04:00
