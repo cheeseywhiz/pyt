@@ -37,3 +37,14 @@ def tabuation_clear(selection=None):
 
 def character_tabulation_set():
     return escape_command(HTS)
+
+
+def line_position_absolute(nth_line=None):
+    if nth_line is None:
+        nth_line = 1
+
+    return control_sequence(VPA, nth_line)
+
+
+def reset_to_initial_state():
+    return escape_command(RIS)

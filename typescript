@@ -1,17 +1,7 @@
-Script started on 2018-08-21 16:51:25-04:00
-]0;cheese@ArchLinux:~/pyt[1;32mcheese[0m: 04:51:26 PM: [1;34mpyt[0m (master)
-$ ]0;cheese: 04:51:26 PM: pyt (master)\python tests/tabulation_clear.py; exit
-[1Ga	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	
-
-[33G[0g[1Ga	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	
-
-[227G[0g[1Ga	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	
-
-[3g[1Ga	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	
-
-[1GH[9GH[17GH[25GH[33GH[41GH[49GH[57GH[65GH[73GH[81GH[89GH[97GH[105GH[113GH[121GH[129GH[137GH[145GH[153GH[161GH[169GH[177GH[185GH[193GH[201GH[209GH[217GH[225GH
-[1Ga	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	a	
-
+Script started on 2018-08-21 23:32:33-04:00
+]0;cheese@ArchLinux:~/pyt[1;32mcheese[0m: 11:32:34 PM: [1;34mpyt[0m (master)
+$ ]0;cheese: 11:32:34 PM: pyt (master)\python tests/line_position_absolute.py; exit
+c[1dhello world[28dmiddle of screen[56dgoodbye world
 exit
 
-Script done on 2018-08-21 16:51:27-04:00
+Script done on 2018-08-21 23:32:35-04:00
