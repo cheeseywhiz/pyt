@@ -1,3 +1,4 @@
+import dataclasses
 import functools
 import os
 import xcffib
@@ -79,12 +80,24 @@ def gc_check(method):
     return wrapped
 
 
+def font_check(method):
+    @functools.wraps(method)
+    def wrapped(self, *args, **kwargs):
+        if self.font_id is None:
+            raise RuntimeError('Font has not been opened')
+
+        return method(self, *args, **kwargs)
+
+    return wrapped
+
+
 class ConnectionAPIWrapper(ConnectionHandler):
     # Wraps core API to expose more pythonic and high level API
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.window_id = None
         self.gc_id = None
+        self.font_id = None
 
     @property
     def screen(self):
@@ -112,14 +125,17 @@ class ConnectionAPIWrapper(ConnectionHandler):
     @gc_check
     def free_gc(self):
         self.core.FreeGC(self.gc_id)
+        self.gc_id = None
+        return self
 
     def __exit__(self, exc_type, exc_value, traceback):
-        try:
+        if self.gc_id:
             self.free_gc()
-        except RuntimeError:
-            pass
-        finally:
-            super().__exit__(exc_type, exc_value, traceback)
+
+        if self.font_id:
+            self.close_font()
+
+        super().__exit__(exc_type, exc_value, traceback)
 
     @gc_check
     @window_check
@@ -139,6 +155,30 @@ class ConnectionAPIWrapper(ConnectionHandler):
         self.core.ChangeProperty(mode, self.window_id, property, type, format,
                                  data_len, data)
         return self
+
+    def open_font(self, name):
+        try:
+            self.close_font()
+        except RuntimeError:
+            self.font_id = super().generate_id()
+            self.core.OpenFont(self.font_id, len(name), name)
+        finally:
+            return self
+
+    @font_check
+    def close_font(self):
+        self.core.CloseFont(self.font_id)
+        self.font_id = None
+        return self
+
+    @gc_check
+    def image_text_8(self, x, y, text):
+        self.core.ImageText8(len(text), self.window_id, self.gc_id, x, y, text)
+        return self
+
+    @font_check
+    def query_font(self):
+        return self.core.QueryFont(self.font_id).reply()
 
     def intern_atom(self, name, only_if_exists=False):
         return self.core\
@@ -210,14 +250,70 @@ class ConnectionAbstractionLayer(ConnectionAPIWrapper):
         return True
 
 
-class ConnectionBase(ConnectionAbstractionLayer):
+@dataclasses.dataclass
+class FontOffset:
+    left: int = 0
+    ascent: int = 0
+
+    @classmethod
+    def from_font_query(cls, font_query):
+        return cls(
+            font_query.min_bounds.left_side_bearing,
+            font_query.max_bounds.ascent)
+
+    def apply_to_xy(self, x, y):
+        return x - self.left, y + self.ascent
+
+
+@dataclasses.dataclass
+class FontInfo:
+    width: int = 1
+    height: int = 1
+    offset: FontOffset = dataclasses.field(default_factory=FontOffset)
+
+    @classmethod
+    def from_font_query(cls, font_query):
+        max_bounds = font_query.max_bounds
+        min_bounds = font_query.min_bounds
+        return cls(
+            max_bounds.right_side_bearing - min_bounds.left_side_bearing,
+            max_bounds.ascent + max_bounds.descent,
+            FontOffset.from_font_query(font_query))
+
+    def cell_to_xy(self, row, col):
+        return self.offset.apply_to_xy(row * self.width, col * self.height)
+
+
+class ConnectionFont(ConnectionAbstractionLayer):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.font_info = FontInfo()
+
+    def init_font(self, name):
+        font_query = super().open_font(name).query_font()
+        self.font_info = FontInfo.from_font_query(font_query)
+        return self
+
+    def put_text(self, row, col, text):
+        return super().image_text_8(*self.font_info.cell_to_xy(row, col), text)
+
+    def new_window(self, n_rows, n_cols, attrs):
+        width = n_cols * self.font_info.width
+        height = n_rows * self.font_info.height
+        return super().new_window(width, height, attrs)
+
+
+class ConnectionBase(ConnectionFont):
     pass
 
 
 class Connection(ConnectionBase):
     def xinit(self):
-        return super().xinit().new_window(
-            width=pyt.config.width * 6, height=pyt.config.height * 13,
+        return super().xinit().init_font(
+            name='fixed',
+        ).new_window(
+            n_cols=pyt.config.width,
+            n_rows=pyt.config.height,
             attrs={
                 xproto.CW.BackPixel: self.screen.black_pixel,
                 xproto.CW.EventMask: (
@@ -236,7 +332,22 @@ class Connection(ConnectionBase):
             return False
 
         if isinstance(event, xproto.ExposeEvent):
-            self.poly_fill_rectangle((0, 0, 80 * 6, 24 * 13))
+            width = 80
+            height = 24
+            width *= self.font_info.width
+            height *= self.font_info.height
+            width //= 3
+            height //= 3
+            super().poly_fill_rectangle(
+                (0, 0, width, height),
+                (0, 2 * height, width, height),
+                (2 * width, 0, width, height),
+                (2 * width, 2 * height, width, height),
+            ).put_text(
+                1, 1, 'hello world',
+            ).put_text(
+                1, 3, 'goodbye world',
+            )
 
         return True
 
