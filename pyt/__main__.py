@@ -23,11 +23,14 @@ class TerminalStore(redux.Store):
 
 
 def main():
-    Connection().run()
-#     store = TerminalStore()
+    store = TerminalStore()
 
-#     with open('typescript', 'rb') as file:
-#         store.dispatch(actions.PutByteSequence(file.read()))
+    with open('typescript', 'rb') as file:
+        store.dispatch(actions.PutByteSequence(file.read()))
+
+    connection = Connection()
+    connection.terminal = store.state
+    connection.run()
 
 
 if __name__ == '__main__':

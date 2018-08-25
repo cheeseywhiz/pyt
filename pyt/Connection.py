@@ -24,26 +24,23 @@ class Connection(ConnectionBase):
             xproto.GC.GraphicsExposures: False,
         }).map_window()
 
+    def draw_terminal(self):
+        width = config.width
+        height = config.height
+
+        for cursor, code_point in self.terminal.screen.items():
+            if not (0 <= cursor.x < width and 0 <= cursor.y < height):
+                continue
+
+            super().put_text(cursor.x, cursor.y, chr(code_point))
+
+        return self
+
     def handle_event(self, event):
         if not super().handle_event(event):
             return False
 
         if isinstance(event, xproto.ExposeEvent):
-            width = 80
-            height = 24
-            width *= self.font_info.width
-            height *= self.font_info.height
-            width //= 3
-            height //= 3
-            super().poly_fill_rectangle(
-                (0, 0, width, height),
-                (0, 2 * height, width, height),
-                (2 * width, 0, width, height),
-                (2 * width, 2 * height, width, height),
-            ).put_text(
-                1, 1, 'hello world',
-            ).put_text(
-                1, 3, 'goodbye world',
-            )
+            self.draw_terminal()
 
         return True

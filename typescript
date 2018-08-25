@@ -1,10 +1,17 @@
-Script started on 2018-08-21 23:44:07-04:00
-]0;cheese@ArchLinux:~/pyt[1;32mcheese[0m: 11:44:08 PM: [1;34mpyt[0m (master)
-$ ]0;cheese: 11:44:08 PM: pyt (master)\python tests/line_feed.py; exit
-chello world
-super long text string under hello world[28dmiddle of screen
-second middle line[56dgoodbye world
-second line of bottom[1doverwrite new top line
+Script started on 2018-08-24 21:34:43-04:00
+]0;cheese@ArchLinux:~/pyt[1;32mcheese[0m: 09:34:43 PM: [1;34mpyt[0m (master)
+$ ]0;cheese: 09:34:43 PM: pyt (master)\python tests/tabulation_clear.py; exit
+[1Ga	a	a	a	a	a	a	a	a	a	a	a	
+
+[33G[0g[1Ga	a	a	a	a	a	a	a	a	a	a	a	
+
+[80G[0g[1Ga	a	a	a	a	a	a	a	a	a	a	a	
+
+[3g[1Ga	a	a	a	a	a	a	a	a	a	a	a	
+
+[1GH[9GH[17GH[25GH[33GH[41GH[49GH[57GH[65GH[73GH[81GH
+[1Ga	a	a	a	a	a	a	a	a	a	a	a	
+
 exit
 
-Script done on 2018-08-21 23:44:10-04:00
+Script done on 2018-08-24 21:34:44-04:00
