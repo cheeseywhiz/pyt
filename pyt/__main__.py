@@ -1,9 +1,19 @@
+import random
 import redux
+import time
+import threading
 from .Terminal import Terminal
 from . import actions
 from .Connection import Connection
 
 __all__ = 'main',
+
+
+class SlowSendTerminal(threading.Thread):
+    def run(self):
+        connection, terminal = self._args
+        time.sleep(random.uniform(1, 3))
+        connection.event_q.put(terminal)
 
 
 class TerminalStore(redux.Store):
@@ -29,8 +39,10 @@ def main():
         store.dispatch(actions.PutByteSequence(file.read()))
 
     connection = Connection()
-    connection.terminal = store.state
+    thread = SlowSendTerminal(args=(connection, store.state))
+    thread.start()
     connection.run()
+    thread.join()
 
 
 if __name__ == '__main__':

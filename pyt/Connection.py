@@ -1,11 +1,16 @@
 from xcffib import xproto
 from .ConnectionBase import ConnectionBase
 from . import config
+from .Terminal import Terminal
 
 __all__ = 'Connection',
 
 
 class Connection(ConnectionBase):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.terminal = None
+
     def xinit(self):
         return super().xinit().init_font(
             name='fixed',
@@ -25,6 +30,9 @@ class Connection(ConnectionBase):
         }).map_window()
 
     def draw_terminal(self):
+        if self.terminal is None:
+            return self
+
         width = config.width
         height = config.height
 
@@ -41,6 +49,10 @@ class Connection(ConnectionBase):
             return False
 
         if isinstance(event, xproto.ExposeEvent):
+            self.draw_terminal()
+
+        if isinstance(event, Terminal):
+            self.terminal = event
             self.draw_terminal()
 
         return True
