@@ -1,6 +1,7 @@
 import redux
 from .Terminal import Terminal
 from . import actions
+from .Connection import Connection
 
 __all__ = 'main',
 
@@ -22,10 +23,11 @@ class TerminalStore(redux.Store):
 
 
 def main():
-    store = TerminalStore()
+    Connection().run()
+#     store = TerminalStore()
 
-    with open('typescript', 'rb') as file:
-        store.dispatch(actions.PutByteSequence(file.read()))
+#     with open('typescript', 'rb') as file:
+#         store.dispatch(actions.PutByteSequence(file.read()))
 
 
 if __name__ == '__main__':

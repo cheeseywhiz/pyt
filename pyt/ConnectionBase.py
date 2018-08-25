@@ -1,6 +1,5 @@
 import dataclasses
 import functools
-import os
 import xcffib
 from xcffib import xproto
 import pyt.config
@@ -9,11 +8,6 @@ import pyt.config
 class ConnectionHandler(xcffib.Connection):
     # provides basic main loop handler
     # user of class wraps xinit and handle_event
-    @classmethod
-    def from_env(cls):
-        display = os.getenv('DISPLAY')
-        return cls(display)
-
     def __enter__(self):
         return self.xinit()
 
@@ -239,7 +233,10 @@ class ConnectionAbstractionLayer(ConnectionAPIWrapper):
             [self.wm_delete_window],
             format=32)
 
-    def init_wm(self, name, class_, instance=None):
+    def init_wm(self, class_, name=None, instance=None):
+        if name is None:
+            name = class_
+
         return self \
             .set_wm_protocols() \
             .set_wm_class(class_, instance) \
@@ -311,56 +308,3 @@ class ConnectionFont(ConnectionAbstractionLayer):
 
 class ConnectionBase(ConnectionFont):
     pass
-
-
-class Connection(ConnectionBase):
-    def xinit(self):
-        return super().xinit().init_font(
-            name='fixed',
-        ).new_window(
-            n_cols=pyt.config.width,
-            n_rows=pyt.config.height,
-            attrs={
-                xproto.CW.BackPixel: self.screen.black_pixel,
-                xproto.CW.EventMask: (
-                    xproto.EventMask.Exposure
-                    | xproto.EventMask.StructureNotify)}
-        ).init_wm(
-            name='Hello World XCB Example',
-            class_='xcb_example',
-        ).create_gc({
-            xproto.GC.Foreground: self.screen.white_pixel,
-            xproto.GC.GraphicsExposures: False,
-        }).map_window()
-
-    def handle_event(self, event):
-        if not super().handle_event(event):
-            return False
-
-        if isinstance(event, xproto.ExposeEvent):
-            width = 80
-            height = 24
-            width *= self.font_info.width
-            height *= self.font_info.height
-            width //= 3
-            height //= 3
-            super().poly_fill_rectangle(
-                (0, 0, width, height),
-                (0, 2 * height, width, height),
-                (2 * width, 0, width, height),
-                (2 * width, 2 * height, width, height),
-            ).put_text(
-                1, 1, 'hello world',
-            ).put_text(
-                1, 3, 'goodbye world',
-            )
-
-        return True
-
-
-def main():
-    Connection.from_env().run()
-
-
-if __name__ == '__main__':
-    main()
