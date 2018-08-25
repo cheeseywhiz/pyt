@@ -6,6 +6,7 @@ import time
 import threading
 from .Terminal import Terminal
 from . import actions
+from .Logger import Logger
 from .Connection import Connection
 
 __all__ = 'main',
@@ -25,14 +26,14 @@ class TerminalStore(redux.Store):
         super().__init__(Terminal())
         self.event_queue = event_queue
         self.sub_queue_state()
-        self.sub_print_state()
+        self.sub_log_state()
 
     def queue_state(self):
         self.event_queue.put(self.state)
 
-    def print_state(self):
-        print(self.state)
-        print(self.state.screen_str)
+    def log_state(self):
+        Logger.debug(self.state)
+        Logger.debug(self.state.screen_str)
 
     def sub_queue_state(self):
         self._unsub_queue_state = super().subscribe(self.queue_state)
@@ -40,11 +41,11 @@ class TerminalStore(redux.Store):
     def unsub_queue_state(self):
         self._unsub_queue_state()
 
-    def sub_print_state(self):
-        self._unsub_print_state = super().subscribe(self.print_state)
+    def sub_log_state(self):
+        self._unsub_log_state = super().subscribe(self.log_state)
 
-    def unsub_print_state(self):
-        self._unsub_print_state()
+    def unsub_log_state(self):
+        self._unsub_log_state()
 
 
 def main():

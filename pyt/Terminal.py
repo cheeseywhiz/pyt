@@ -1,6 +1,7 @@
 from . import actions
 from . import config
 from . import control_codes
+from .Logger import Logger
 from .TerminalActions import TerminalActions
 from .ParsedCSI import ParsedCSI
 from .NextCharMode import NextCharMode
@@ -31,7 +32,7 @@ class Terminal(TerminalActions):
         elif C0 is control_codes.C0.HT:
             return self.character_tabulation()
 
-        print(f'Unhandled C0: {C0 !r}')
+        Logger.warning(f'Unhandled C0: {C0 !r}')
         return self
 
     def handle_C1(self, C1):
@@ -65,7 +66,7 @@ class Terminal(TerminalActions):
             self.next_char_mode = NextCharMode.SET_CHAR_SET
             return self
 
-        print(f'Unhandled C1: {C1 !r}')
+        Logger.warning(f'Unhandled C1: {C1 !r}')
         return self
 
     def handle_char(self, code_point):
@@ -82,7 +83,7 @@ class Terminal(TerminalActions):
         if C1 is not None:
             return self.handle_C1(C1)
 
-        print(f'Unknown esc: %s' % hex(code_point))
+        Logger.warning(f'Unknown esc: %s' % hex(code_point))
         self.next_char_mode = NextCharMode.CHAR
         return self
 
@@ -114,7 +115,7 @@ class Terminal(TerminalActions):
         csi_func = self.get_csi_func(csi.csi_type)
 
         if csi_func is None:
-            print(f'Unhandled csi: {csi}')
+            Logger.warning(f'Unhandled csi: {csi}')
             return self
 
         return csi_func(*csi.args)
@@ -130,8 +131,8 @@ class Terminal(TerminalActions):
 
     def handle_csi(self, code_point):
         if code_point in range(0x20, 0x30):
-            print('Skipping control sequence with intermediate byte '
-                  '(%s)' % hex(code_point))
+            Logger.warning('Skipping control sequence with intermediate byte '
+                           '(%s)' % hex(code_point))
             self.next_char_mode = NextCharMode.CHAR
             return self.reset_csi_buffer()
 
@@ -145,11 +146,11 @@ class Terminal(TerminalActions):
 
             return self
 
-        print(f'Unknown csi: %s' % hex(code_point))
+        Logger.warning(f'Unknown csi: %s' % hex(code_point))
         return self
 
     def parse_string_impl(self, string_type, string):
-        print(f'Received string ({string_type !r}) {string !r}')
+        Logger.info(f'Received string ({string_type !r}) {string !r}')
         return self
 
     def parse_string(self):
@@ -189,8 +190,8 @@ class Terminal(TerminalActions):
                 .handle_esc()
 
     def handle_set_char_set(self, code_point):
-        print('Ignoring character set setting '
-              f'{self.set_char_set_selection !r} = {hex(code_point)}')
+        Logger.info('Ignoring character set setting '
+                    f'{self.set_char_set_selection !r} = {hex(code_point)}')
         self.next_char_mode = NextCharMode.CHAR
         self.set_char_set_selection = None
         return self

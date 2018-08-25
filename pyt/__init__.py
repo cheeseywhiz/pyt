@@ -6,8 +6,9 @@ from .ParsedCSI import ParsedCSI
 from .UnicodeBuffer import UnicodeBuffer
 from .Tabs import Tabs
 from .Connection import Connection
+from .Logger import Logger
 
 __all__ = (
     'actions', 'control_codes', 'config', 'Terminal', 'ParsedCSI',
-    'UnicodeBuffer', 'Tabs', 'Connection',
+    'UnicodeBuffer', 'Tabs', 'Connection', 'Logger',
 )
