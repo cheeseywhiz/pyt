@@ -149,6 +149,11 @@ class ConnectionAPIWrapper(ConnectionHandler):
     def query_font(self):
         return self.core.QueryFont(self.font_id).reply()
 
+    @window_check
+    def clear_area(self, x, y, width, height, exposures=True):
+        self.core.ClearArea(exposures, self.window_id, x, y, width, height)
+        return self
+
     def intern_atom(self, name, only_if_exists=False):
         return self.core\
             .InternAtom(only_if_exists, len(name), name) \
@@ -220,6 +225,9 @@ class ConnectionAbstractionLayer(ConnectionAPIWrapper):
                 return False
 
         return True
+
+    def clear(self):
+        return super().clear_area(0, 0, 0xffff, 0xffff)
 
 
 @dataclasses.dataclass

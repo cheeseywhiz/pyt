@@ -33,6 +33,7 @@ class Connection(ConnectionBase):
         if self.terminal is None:
             return self
 
+        self.clear()
         width = config.width
         height = config.height
 
