@@ -10,38 +10,47 @@ from .Connection import Connection
 __all__ = 'main',
 
 
-class SlowSendTerminal(threading.Thread):
+class SlowDispatch(threading.Thread):
     def run(self):
-        event_queue, terminal = self._args
+        store, = self._args
         time.sleep(random.uniform(1, 3))
-        event_queue.put(terminal)
+
+        with open('typescript', 'rb') as file:
+            store.dispatch(actions.PutByteSequence(file.read()))
 
 
 class TerminalStore(redux.Store):
-    def __init__(self):
+    def __init__(self, event_queue):
         super().__init__(Terminal())
-        self.subscribe_print_state()
+        self.event_queue = event_queue
+        self.sub_queue_state()
+        self.sub_print_state()
+
+    def queue_state(self):
+        self.event_queue.put(self.state)
 
     def print_state(self):
         print(self.state)
         print(self.state.screen_str)
 
-    def subscribe_print_state(self):
-        self._unsubscribe_print_state = super().subscribe(self.print_state)
+    def sub_queue_state(self):
+        self._unsub_queue_state = super().subscribe(self.queue_state)
 
-    def unsubscribe_print_state(self):
-        self._unsubscribe_print_state()
+    def unsub_queue_state(self):
+        self._unsub_queue_state()
+
+    def sub_print_state(self):
+        self._unsub_print_state = super().subscribe(self.print_state)
+
+    def unsub_print_state(self):
+        self._unsub_print_state()
 
 
 def main():
     event_queue = queue.Queue()
-    store = TerminalStore()
-
-    with open('typescript', 'rb') as file:
-        store.dispatch(actions.PutByteSequence(file.read()))
-
+    store = TerminalStore(event_queue)
     connection = Connection(event_queue=event_queue)
-    thread = SlowSendTerminal(args=(event_queue, store.state))
+    thread = SlowDispatch(args=(store, ))
     thread.start()
     connection.run()
     thread.join()
