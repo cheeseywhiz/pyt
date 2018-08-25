@@ -43,21 +43,6 @@ class ConnectionHandler(xcffib.Connection):
             self.start_loop()
 
 
-def key_from_item(item):
-    key, value = item
-    return key
-
-
-def parse_attrs(attrs):
-    attrs_sorted = dict(sorted(attrs.items(), key=key_from_item))
-    value_mask = 0
-
-    for key in attrs_sorted.keys():
-        value_mask |= key
-
-    return value_mask, list(attrs_sorted.values())
-
-
 def window_check(method):
     @functools.wraps(method)
     def wrapped(self, *args, **kwargs):
@@ -103,12 +88,29 @@ class ConnectionAPIWrapper(ConnectionHandler):
     def screen(self):
         return self.setup.roots[0]
 
+    @staticmethod
+    def parse_attrs(attrs):
+        def key_from_item(item):
+            key, value = item
+            return key
+
+        attrs_sorted = dict(sorted(attrs.items(), key=key_from_item))
+        value_mask = 0
+
+        for key in attrs_sorted.keys():
+            value_mask |= key
+
+        return value_mask, list(attrs_sorted.values())
+
     def create_window(self, depth, parent, x, y, width, height, border_width,
-                      class_, visual, attrs):
+                      class_, visual, attrs=None):
+        if attrs is None:
+            attrs = {}
+
         self.window_id = super().generate_id()
         self.core.CreateWindow(depth, self.window_id, parent, x, y, width,
                                height, border_width, class_, visual,
-                               *parse_attrs(attrs))
+                               *self.parse_attrs(attrs))
         return self
 
     @window_check
@@ -117,9 +119,13 @@ class ConnectionAPIWrapper(ConnectionHandler):
         return self
 
     @window_check
-    def create_gc(self, attrs):
+    def create_gc(self, attrs=None):
+        if attrs is None:
+            attrs = {}
+
         self.gc_id = super().generate_id()
-        self.core.CreateGC(self.gc_id, self.window_id, *parse_attrs(attrs))
+        self.core.CreateGC(self.gc_id, self.window_id,
+                           *self.parse_attrs(attrs))
         return self
 
     @gc_check
@@ -192,7 +198,7 @@ class ConnectionAbstractionLayer(ConnectionAPIWrapper):
         super().__init__(*args, **kwargs)
         self.wm_delete_window = None
 
-    def new_window(self, width, height, attrs):
+    def new_window(self, width, height, attrs=None):
         return super().create_window(
             self.screen.root_depth,
             self.screen.root,
@@ -201,7 +207,7 @@ class ConnectionAbstractionLayer(ConnectionAPIWrapper):
             0,  # border width
             xproto.WindowClass.InputOutput,
             self.screen.root_visual,
-            attrs)
+            attrs=attrs)
 
     def replace_property(self, property, type, data, format=8):
         return super().change_property(
@@ -297,10 +303,10 @@ class ConnectionFont(ConnectionAbstractionLayer):
     def put_text(self, row, col, text):
         return super().image_text_8(*self.font_info.cell_to_xy(row, col), text)
 
-    def new_window(self, n_rows, n_cols, attrs):
+    def new_window(self, n_rows, n_cols, attrs=None):
         width = n_cols * self.font_info.width
         height = n_rows * self.font_info.height
-        return super().new_window(width, height, attrs)
+        return super().new_window(width, height, attrs=attrs)
 
 
 class ConnectionBase(ConnectionFont):
