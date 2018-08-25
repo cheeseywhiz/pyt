@@ -5,9 +5,8 @@ from .Terminal import Terminal
 from .ParsedCSI import ParsedCSI
 from .UnicodeBuffer import UnicodeBuffer
 from .Tabs import Tabs
-from .Face import Face
 
 __all__ = (
     'actions', 'control_codes', 'config', 'Terminal', 'ParsedCSI',
-    'UnicodeBuffer', 'Tabs', 'Face',
+    'UnicodeBuffer', 'Tabs',
 )

@@ -1,6 +1,5 @@
 cffi==1.11.5
-freetype-py==2.0.0.post6
-numpy==1.15.0
+numpy==1.15.1
 pycparser==2.18
 six==1.11.0
 xcffib==0.6.0
