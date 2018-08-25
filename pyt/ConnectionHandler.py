@@ -1,4 +1,3 @@
-import queue
 import threading
 import xcffib
 from xcffib import xproto
@@ -6,30 +5,20 @@ from xcffib import xproto
 __all__ = 'ConnectionHandler',
 
 
-class EventQ(queue.Queue):
-    def __init__(self, connection):
-        super().__init__()
-        self.connection = connection
-        self.thread = threading.Thread(target=self.put_x_events, daemon=True)
-
-    def start(self):
-        self.thread.start()
-
-    def put_x_events(self):
-        while True:
-            event = self.connection.wait_for_event()
-            self.put(event)
-
-
 class ConnectionHandler(xcffib.Connection):
     # provides basic main loop handler
     # user of class wraps xinit and handle_event
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, event_queue=None, **kwargs):
         super().__init__(*args, **kwargs)
-        self.event_q = EventQ(self)
+        self.event_queue = event_queue
+
+    def queue_x_events(self):
+        while True:
+            event = self.wait_for_event()
+            self.event_queue.put(event)
 
     def __enter__(self):
-        self.event_q.start()
+        threading.Thread(target=self.queue_x_events, daemon=True).start()
         return self.xinit().flush()
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -49,10 +38,10 @@ class ConnectionHandler(xcffib.Connection):
         return True
 
     def handle_next_event(self):
-        event = self.event_q.get()
+        event = self.event_queue.get()
         loop_is_not_done = self.handle_event(event)
         self.flush()
-        self.event_q.task_done()
+        self.event_queue.task_done()
         return loop_is_not_done
 
     def run(self):

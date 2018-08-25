@@ -1,3 +1,4 @@
+import queue
 import random
 import redux
 import time
@@ -11,9 +12,9 @@ __all__ = 'main',
 
 class SlowSendTerminal(threading.Thread):
     def run(self):
-        connection, terminal = self._args
+        event_queue, terminal = self._args
         time.sleep(random.uniform(1, 3))
-        connection.event_q.put(terminal)
+        event_queue.put(terminal)
 
 
 class TerminalStore(redux.Store):
@@ -33,13 +34,14 @@ class TerminalStore(redux.Store):
 
 
 def main():
+    event_queue = queue.Queue()
     store = TerminalStore()
 
     with open('typescript', 'rb') as file:
         store.dispatch(actions.PutByteSequence(file.read()))
 
-    connection = Connection()
-    thread = SlowSendTerminal(args=(connection, store.state))
+    connection = Connection(event_queue=event_queue)
+    thread = SlowSendTerminal(args=(event_queue, store.state))
     thread.start()
     connection.run()
     thread.join()
