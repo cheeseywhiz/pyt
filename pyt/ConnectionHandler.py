@@ -38,7 +38,10 @@ class ConnectionHandler(xcffib.Connection):
         self.flush()
         return loop_is_not_done
 
+    def loop(self):
+        while self.handle_next_event():
+            pass
+
     def run(self):
         with self:
-            while self.handle_next_event():
-                pass
+            self.loop()

@@ -1,16 +1,20 @@
+import multiprocessing
 import queue
 import sys
 from xcffib import xproto
 from .ConnectionBase import ConnectionBase
 from . import config
+from .redraw_window import redraw_window
 
 __all__ = 'Connection',
 
 
 class Connection(ConnectionBase):
-    def __init__(self, *args, terminal_queue=None, **kwargs):
+    def __init__(self, *args, terminal_queue=None, redraw_event=None,
+                 **kwargs):
         super().__init__(*args, **kwargs)
         self.terminal_queue = terminal_queue
+        self.redraw_event = redraw_event
         self.terminal = None
 
     def xinit(self):
@@ -76,3 +80,10 @@ class Connection(ConnectionBase):
             self.draw_terminal()
 
         return True
+
+    def loop(self):
+        multiprocessing.Process(
+            target=redraw_window(self.redraw_event, self.window_id),
+            daemon=True,
+        ).start()
+        super().loop()

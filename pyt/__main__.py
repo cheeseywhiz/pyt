@@ -10,10 +10,10 @@ from .Connection import Connection
 __all__ = 'main',
 
 
-def run_terminal(terminal_queue):
+def run_terminal(terminal_queue, redraw_event):
     def run():
         Logger.debug('run_terminal')
-        store = TerminalStore(terminal_queue)
+        store = TerminalStore(terminal_queue, redraw_event)
 
         with open('typescript', 'rb') as file:
             for line in file:
@@ -26,14 +26,16 @@ def run_terminal(terminal_queue):
 
 
 class TerminalStore(redux.Store):
-    def __init__(self, terminal_queue):
+    def __init__(self, terminal_queue, redraw_event):
         super().__init__(Terminal())
         self.terminal_queue = terminal_queue
+        self.redraw_event = redraw_event
         self.sub_queue_state()
         self.sub_log_state()
 
     def queue_state(self):
         self.terminal_queue.put(self.state)
+        self.redraw_event.set()
 
     def log_state(self):
         Logger.debug(self.state)
@@ -55,8 +57,11 @@ class TerminalStore(redux.Store):
 def main():
     Logger.debug('GUI')
     terminal_queue = multiprocessing.Queue()
-    connection = Connection(terminal_queue=terminal_queue)
-    proc = multiprocessing.Process(target=run_terminal(terminal_queue))
+    redraw_event = multiprocessing.Event()
+    connection = Connection(
+        terminal_queue=terminal_queue, redraw_event=redraw_event)
+    proc = multiprocessing.Process(
+        target=run_terminal(terminal_queue, redraw_event))
     proc.start()
     connection.run()
     proc.join()

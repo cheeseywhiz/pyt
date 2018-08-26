@@ -226,8 +226,11 @@ class ConnectionAbstractionLayer(ConnectionAPIWrapper):
 
         return True
 
-    def clear(self):
-        return super().clear_area(0, 0, 0xffff, 0xffff, exposures=False)
+    def clear(self, exposures=False):
+        return super().clear_area(0, 0, 0xffff, 0xffff, exposures=exposures)
+
+    def redraw(self):
+        return self.clear(exposures=True)
 
 
 @dataclasses.dataclass
