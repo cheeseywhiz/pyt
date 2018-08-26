@@ -1,7 +1,6 @@
 import logging
-import queue
+import multiprocessing
 import sys
-import threading
 
 __all__ = 'Logger',
 
@@ -23,14 +22,14 @@ def print_messages(message_queue):
         while True:
             message = message_queue.get()
             print(message, file=sys.stderr)
-            message_queue.task_done()
 
     return run
 
 
 def instantiate(cls):
-    message_queue = queue.Queue()
-    threading.Thread(target=print_messages(message_queue), daemon=True).start()
+    message_queue = multiprocessing.Queue()
+    multiprocessing.Process(target=print_messages(message_queue),
+                            daemon=True).start()
     return cls(message_queue)
 
 

@@ -1,4 +1,4 @@
-import threading
+import multiprocessing
 import xcffib
 from xcffib import xproto
 
@@ -18,7 +18,8 @@ class ConnectionHandler(xcffib.Connection):
             self.event_queue.put(event)
 
     def __enter__(self):
-        threading.Thread(target=self.queue_x_events, daemon=True).start()
+        multiprocessing.Process(target=self.queue_x_events,
+                                daemon=True).start()
         return self.xinit().flush()
 
     def __exit__(self, exc_type, exc_value, traceback):
@@ -41,7 +42,6 @@ class ConnectionHandler(xcffib.Connection):
         event = self.event_queue.get()
         loop_is_not_done = self.handle_event(event)
         self.flush()
-        self.event_queue.task_done()
         return loop_is_not_done
 
     def run(self):

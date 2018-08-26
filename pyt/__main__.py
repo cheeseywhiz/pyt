@@ -1,9 +1,7 @@
-import queue
+import multiprocessing
 import random
 import redux
-import sys
 import time
-import threading
 from .Terminal import Terminal
 from . import actions
 from .Logger import Logger
@@ -14,9 +12,10 @@ __all__ = 'main',
 
 def slow_dispatch(dispatch):
     def run():
-            for line in sys.stdin:
+        with open('typescript', 'rb') as file:
+            for line in file:
                 time.sleep(random.random())
-                dispatch(actions.PutByteSequence(map(ord, line)))
+                dispatch(actions.PutByteSequence(line))
 
     return run
 
@@ -49,13 +48,13 @@ class TerminalStore(redux.Store):
 
 
 def main():
-    event_queue = queue.Queue()
+    event_queue = multiprocessing.Queue()
     store = TerminalStore(event_queue)
     connection = Connection(event_queue=event_queue)
-    thread = threading.Thread(target=slow_dispatch(store.dispatch))
-    thread.start()
+    proc = multiprocessing.Process(target=slow_dispatch(store.dispatch))
+    proc.start()
     connection.run()
-    thread.join()
+    proc.join()
 
 
 if __name__ == '__main__':
