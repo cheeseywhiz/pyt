@@ -227,7 +227,7 @@ class ConnectionAbstractionLayer(ConnectionAPIWrapper):
         return True
 
     def clear(self):
-        return super().clear_area(0, 0, 0xffff, 0xffff)
+        return super().clear_area(0, 0, 0xffff, 0xffff, exposures=False)
 
 
 @dataclasses.dataclass
