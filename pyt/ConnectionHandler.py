@@ -1,6 +1,7 @@
 import multiprocessing
 import xcffib
 from xcffib import xproto
+from .Logger import Logger
 
 __all__ = 'ConnectionHandler',
 
@@ -13,6 +14,8 @@ class ConnectionHandler(xcffib.Connection):
         self.event_queue = event_queue
 
     def queue_x_events(self):
+        Logger.info('queue_x_events')
+
         while True:
             event = self.wait_for_event()
             self.event_queue.put(event)
@@ -33,6 +36,9 @@ class ConnectionHandler(xcffib.Connection):
         return self
 
     def handle_event(self, event):
+        for func in [id, type, vars]:
+            print(func(event))
+
         if isinstance(event, xproto.DestroyNotifyEvent):
             return False
 

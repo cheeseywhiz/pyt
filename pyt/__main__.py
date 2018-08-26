@@ -12,6 +12,8 @@ __all__ = 'main',
 
 def slow_dispatch(dispatch):
     def run():
+        Logger.info('slow_dispatch')
+
         with open('typescript', 'rb') as file:
             for line in file:
                 time.sleep(random.random())
@@ -48,6 +50,7 @@ class TerminalStore(redux.Store):
 
 
 def main():
+    Logger.info('main')
     event_queue = multiprocessing.Queue()
     store = TerminalStore(event_queue)
     connection = Connection(event_queue=event_queue)
