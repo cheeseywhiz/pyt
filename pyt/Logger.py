@@ -1,7 +1,8 @@
 import logging
-import queue
+import multiprocessing
+import os
 import sys
-import threading
+from .make_process import make_process
 
 __all__ = 'Logger',
 
@@ -9,7 +10,8 @@ __all__ = 'Logger',
 class QueueLogHandler(logging.Handler):
     def __init__(self, message_queue):
         super().__init__(logging.NOTSET)
-        fmt = logging.Formatter('%(name)s: %(levelname)s: %(message)s')
+        fmt = logging.Formatter('%(name)s: %(process)d: %(levelname)s: '
+                                '%(message)s')
         super().setFormatter(fmt)
         self.message_queue = message_queue
 
@@ -18,19 +20,18 @@ class QueueLogHandler(logging.Handler):
         self.message_queue.put(message)
 
 
+@make_process(daemon=True)
 def print_messages(message_queue):
-    def run():
-        while True:
-            message = message_queue.get()
-            print(message, file=sys.stderr)
-            message_queue.task_done()
+    print(f'Starting logger on PID {os.getpid()}')
 
-    return run
+    while True:
+        message = message_queue.get()
+        print(message, file=sys.stderr)
 
 
 def instantiate(cls):
-    message_queue = queue.Queue()
-    threading.Thread(target=print_messages(message_queue), daemon=True).start()
+    message_queue = multiprocessing.Queue()
+    print_messages(message_queue)
     return cls(message_queue)
 
 
