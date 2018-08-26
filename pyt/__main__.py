@@ -6,23 +6,22 @@ from .Terminal import Terminal
 from . import actions
 from .Logger import Logger
 from .Connection import Connection
+from .make_process import make_process
 
 __all__ = 'main',
 
 
+@make_process
 def run_terminal(terminal_queue, redraw_event):
-    def run():
-        Logger.debug('run_terminal')
-        store = TerminalStore(terminal_queue, redraw_event)
+    Logger.debug('run_terminal')
+    store = TerminalStore(terminal_queue, redraw_event)
 
-        with open('typescript', 'rb') as file:
-            for line in file:
-                time.sleep(random.random())
-                store.dispatch(actions.PutByteSequence(line))
+    with open('typescript', 'rb') as file:
+        for line in file:
+            time.sleep(random.random())
+            store.dispatch(actions.PutByteSequence(line))
 
-        Logger.debug('run_terminal done')
-
-    return run
+    Logger.debug('run_terminal done')
 
 
 class TerminalStore(redux.Store):
@@ -58,11 +57,9 @@ def main():
     Logger.debug('GUI')
     terminal_queue = multiprocessing.Queue()
     redraw_event = multiprocessing.Event()
-    connection = Connection(
-        terminal_queue=terminal_queue, redraw_event=redraw_event)
-    proc = multiprocessing.Process(
-        target=run_terminal(terminal_queue, redraw_event))
-    proc.start()
+    connection = Connection(terminal_queue=terminal_queue,
+                            redraw_event=redraw_event)
+    proc = run_terminal(terminal_queue, redraw_event)
     connection.run()
     proc.join()
 

@@ -1,4 +1,3 @@
-import multiprocessing
 import queue
 import sys
 from xcffib import xproto
@@ -82,8 +81,5 @@ class Connection(ConnectionBase):
         return True
 
     def loop(self):
-        multiprocessing.Process(
-            target=redraw_window(self.redraw_event, self.window_id),
-            daemon=True,
-        ).start()
+        redraw_window(self.redraw_event, self.window_id)
         super().loop()
