@@ -4,6 +4,7 @@ from xcffib import xproto
 from .ConnectionBase import ConnectionBase
 from . import config
 from .redraw_window import redraw_window
+from .ConnectionBase import window_check
 
 __all__ = 'Connection',
 
@@ -15,6 +16,14 @@ class Connection(ConnectionBase):
         self.terminal_queue = terminal_queue
         self.redraw_event = redraw_event
         self.terminal = None
+
+    @window_check
+    def redraw_window(self):
+        redraw_window(self.redraw_event, self.window_id)
+        return self
+
+    def __enter__(self):
+        return super().__enter__().redraw_window()
 
     def xinit(self):
         return super().xinit().init_font(
@@ -79,7 +88,3 @@ class Connection(ConnectionBase):
             self.draw_terminal()
 
         return True
-
-    def loop(self):
-        redraw_window(self.redraw_event, self.window_id)
-        super().loop()
