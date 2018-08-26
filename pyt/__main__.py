@@ -10,16 +10,17 @@ from .Connection import Connection
 __all__ = 'main',
 
 
-def slow_dispatch(dispatch):
+def run_terminal(terminal_queue):
     def run():
-        Logger.debug('slow_dispatch')
+        Logger.debug('run_terminal')
+        store = TerminalStore(terminal_queue)
 
         with open('typescript', 'rb') as file:
             for line in file:
                 time.sleep(random.random())
-                dispatch(actions.PutByteSequence(line))
+                store.dispatch(actions.PutByteSequence(line))
 
-        Logger.debug('slow_dispatch done')
+        Logger.debug('run_terminal done')
 
     return run
 
@@ -54,9 +55,8 @@ class TerminalStore(redux.Store):
 def main():
     Logger.debug('GUI')
     terminal_queue = multiprocessing.Queue()
-    store = TerminalStore(terminal_queue)
     connection = Connection(terminal_queue=terminal_queue)
-    proc = multiprocessing.Process(target=slow_dispatch(store.dispatch))
+    proc = multiprocessing.Process(target=run_terminal(terminal_queue))
     proc.start()
     connection.run()
     proc.join()
