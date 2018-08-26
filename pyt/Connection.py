@@ -1,14 +1,16 @@
+import queue
+import sys
 from xcffib import xproto
 from .ConnectionBase import ConnectionBase
 from . import config
-from .Terminal import Terminal
 
 __all__ = 'Connection',
 
 
 class Connection(ConnectionBase):
-    def __init__(self, *args, **kwargs):
+    def __init__(self, *args, terminal_queue=None, **kwargs):
         super().__init__(*args, **kwargs)
+        self.terminal_queue = terminal_queue
         self.terminal = None
 
     def xinit(self):
@@ -29,7 +31,28 @@ class Connection(ConnectionBase):
             xproto.GC.GraphicsExposures: False,
         }).map_window()
 
+    def empty_terminal_queue(self, limit=None):
+        """Empty the queue by getting as fast as we can. In case the queue
+        becomes flooded, set a limit on how many times to get."""
+        if limit is None:
+            limit = sys.maxsize
+
+        new_terminal = self.terminal_queue.get(block=False)
+
+        for _ in range(limit):
+            try:
+                new_terminal = self.terminal_queue.get(block=False)
+            except queue.Empty:
+                return new_terminal
+
     def draw_terminal(self):
+        try:
+            new_terminal = self.empty_terminal_queue(24)
+        except queue.Empty:
+            pass
+        else:
+            self.terminal = new_terminal
+
         if self.terminal is None:
             return self
 
@@ -50,10 +73,6 @@ class Connection(ConnectionBase):
             return False
 
         if isinstance(event, xproto.ExposeEvent):
-            self.draw_terminal()
-
-        if isinstance(event, Terminal):
-            self.terminal = event
             self.draw_terminal()
 
         return True

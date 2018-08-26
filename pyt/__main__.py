@@ -25,14 +25,14 @@ def slow_dispatch(dispatch):
 
 
 class TerminalStore(redux.Store):
-    def __init__(self, event_queue):
+    def __init__(self, terminal_queue):
         super().__init__(Terminal())
-        self.event_queue = event_queue
+        self.terminal_queue = terminal_queue
         self.sub_queue_state()
         self.sub_log_state()
 
     def queue_state(self):
-        self.event_queue.put(self.state)
+        self.terminal_queue.put(self.state)
 
     def log_state(self):
         Logger.debug(self.state)
@@ -53,9 +53,9 @@ class TerminalStore(redux.Store):
 
 def main():
     Logger.debug('GUI')
-    event_queue = multiprocessing.Queue()
-    store = TerminalStore(event_queue)
-    connection = Connection(event_queue=event_queue)
+    terminal_queue = multiprocessing.Queue()
+    store = TerminalStore(terminal_queue)
+    connection = Connection(terminal_queue=terminal_queue)
     proc = multiprocessing.Process(target=slow_dispatch(store.dispatch))
     proc.start()
     connection.run()

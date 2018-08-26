@@ -1,4 +1,3 @@
-import multiprocessing
 import xcffib
 from xcffib import xproto
 from .Logger import Logger
@@ -9,28 +8,10 @@ __all__ = 'ConnectionHandler',
 class ConnectionHandler(xcffib.Connection):
     # provides basic main loop handler
     # user of class wraps xinit and handle_event
-    def __init__(self, *args, event_queue=None, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.event_queue = event_queue
-        self.event_process = multiprocessing.Process(
-            target=self.queue_x_events, daemon=True)
-
-    def queue_x_events(self):
-        Logger.debug('queue_x_events')
-
-        while True:
-            event = self.wait_for_event()
-            self.event_queue.put(event)
-
-    def start_event_process(self):
-        self.event_process.start()
-        return self
-
     def __enter__(self):
         return self \
             .xinit() \
-            .flush() \
-            .start_event_process()
+            .flush()
 
     def __exit__(self, exc_type, exc_value, traceback):
         super().disconnect()
@@ -52,7 +33,7 @@ class ConnectionHandler(xcffib.Connection):
         return True
 
     def handle_next_event(self):
-        event = self.event_queue.get()
+        event = super().wait_for_event()
         loop_is_not_done = self.handle_event(event)
         self.flush()
         return loop_is_not_done
