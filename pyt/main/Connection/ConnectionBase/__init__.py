@@ -1,8 +1,9 @@
+import collections
 import dataclasses
 import functools
-import xcffib
+import string
 from xcffib import xproto
-from .... import config
+from .. import x_keys
 from .ConnectionHandler import ConnectionHandler
 
 __all__ = 'ConnectionBase'
@@ -157,10 +158,16 @@ class ConnectionAPIWrapper(ConnectionHandler):
         return self
 
     def intern_atom(self, name, only_if_exists=False):
-        return self.core\
+        return self.core \
             .InternAtom(only_if_exists, len(name), name) \
             .reply() \
             .atom
+
+    def get_keyboard_mapping(self, first_keycode, count):
+        return self.core.GetKeyboardMapping(first_keycode, count).reply()
+
+    def get_modifier_mapping(self):
+        return self.core.GetModifierMapping().reply()
 
 
 class ConnectionAbstractionLayer(ConnectionAPIWrapper):
@@ -288,5 +295,113 @@ class ConnectionFont(ConnectionAbstractionLayer):
         return super().new_window(width, height, attrs=attrs)
 
 
-class ConnectionBase(ConnectionFont):
+class KeyboardInput(ConnectionFont):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.keyboard_mapping = {}
+        self.mod_map = {}
+        self.mod_sets = collections.defaultdict(set)
+        self.mod_presses = set()
+        self.mod_mask = x_keys.Mod.Zero
+
+    def init_keyboard_mapping(self):
+        first_keycode = self.setup.min_keycode
+        last_keycode = self.setup.max_keycode
+        count = last_keycode - first_keycode + 1
+        keycodes = range(first_keycode, last_keycode + 1)
+        x_key_map = super().get_keyboard_mapping(first_keycode, count)
+        keysyms = x_key_map.keysyms
+        keysyms_per_keycode = x_key_map.keysyms_per_keycode
+        self.keyboard_mapping.clear()
+        self.keyboard_mapping.update({
+            k: [keysyms[(k - first_keycode) * keysyms_per_keycode + n]
+                for n in range(keysyms_per_keycode)]
+            for k in keycodes
+        })
+        return self
+
+    def init_mod_map(self):
+        x_mod_map = super().get_modifier_mapping()
+        keycodes = x_mod_map.keycodes
+        keycodes_per_modifier = x_mod_map.keycodes_per_modifier
+        mods = [
+            x_keys.Mod.Shift,
+            x_keys.Mod.Lock,
+            x_keys.Mod.Control,
+            x_keys.Mod.Mod1,
+            x_keys.Mod.Mod2,
+            x_keys.Mod.Mod3,
+            x_keys.Mod.Mod4,
+            x_keys.Mod.Mod5,
+        ]
+        self.mod_sets.clear()
+        self.mod_map.clear()
+
+        for i, keycode in enumerate(keycodes):
+            if keycode:
+                mod = mods[i // keycodes_per_modifier]
+                self.mod_sets[mod].add(keycode)
+                self.mod_map[keycode] = mod
+
+        return self
+
+    def keycode_to_str(self, keycode):
+        keysym = self.keyboard_mapping.get(keycode, [0])[0]
+
+        if keysym == 0:
+            return
+
+        new_str = x_keys.sym_table.get(keysym) or None
+
+        if any(self.mod_mask & mod
+               for mod in (x_keys.Mod.Control, x_keys.Mod.Mod1,
+                           x_keys.Mod.Mod4)):
+            return
+
+        return new_str
+
+    def xinit(self):
+        return self \
+            .init_keyboard_mapping() \
+            .init_mod_map()
+
+    def handle_event(self, event):
+        if not super().handle_event(event):
+            return False
+
+        if isinstance(event, xproto.KeyPressEvent):
+            mod = self.mod_map.get(event.detail)
+
+            if mod is None:
+                return True
+
+            if mod in x_keys.Mod.lock_mods:
+                if self.mod_mask & mod:
+                    self.mod_mask &= ~mod
+                else:
+                    self.mod_mask |= mod
+            else:
+                self.mod_presses.add(event.detail)
+
+        if isinstance(event, xproto.KeyReleaseEvent):
+            mod = self.mod_map.get(event.detail)
+
+            if mod is None:
+                return True
+
+            if mod not in x_keys.Mod.lock_mods:
+                self.mod_presses.discard(event.detail)
+
+        if isinstance(event, (xproto.KeyPressEvent, xproto.KeyReleaseEvent)):
+            for mod, keycodes in self.mod_sets.items():
+                if mod not in x_keys.Mod.lock_mods:
+                    if self.mod_presses.intersection(keycodes):
+                        self.mod_mask |= mod
+                    else:
+                        self.mod_mask &= ~mod
+
+        return True
+
+
+class ConnectionBase(KeyboardInput):
     pass

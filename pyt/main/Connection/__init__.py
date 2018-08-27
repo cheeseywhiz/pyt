@@ -2,6 +2,7 @@ import queue
 import sys
 from xcffib import xproto
 from ... import config
+from ...Logger import Logger
 from .ConnectionBase import ConnectionBase, window_check
 from .redraw_window import redraw_window
 
@@ -34,7 +35,9 @@ class Connection(ConnectionBase):
                 xproto.CW.BackPixel: self.screen.black_pixel,
                 xproto.CW.EventMask: (
                     xproto.EventMask.Exposure
-                    | xproto.EventMask.StructureNotify)}
+                    | xproto.EventMask.StructureNotify
+                    | xproto.EventMask.KeyPress
+                    | xproto.EventMask.KeyRelease)}
         ).init_wm(
             class_='pyt',
         ).create_gc({
@@ -85,5 +88,8 @@ class Connection(ConnectionBase):
 
         if isinstance(event, xproto.ExposeEvent):
             self.draw_terminal()
+
+        if isinstance(event, xproto.KeyPressEvent):
+            Logger.debug('%r pressed', super().keycode_to_str(event.detail))
 
         return True
