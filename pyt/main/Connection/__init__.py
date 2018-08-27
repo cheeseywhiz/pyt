@@ -2,6 +2,7 @@ import queue
 import sys
 from xcffib import xproto
 from ... import config
+from ... import actions
 from ...Logger import Logger
 from .ConnectionBase import ConnectionBase, window_check
 from .redraw_window import redraw_window
@@ -11,10 +12,11 @@ __all__ = 'Connection'
 
 class Connection(ConnectionBase):
     def __init__(self, *args, terminal_queue=None, redraw_event=None,
-                 **kwargs):
+                 action_queue=None, **kwargs):
         super().__init__(*args, **kwargs)
         self.terminal_queue = terminal_queue
         self.redraw_event = redraw_event
+        self.action_queue = action_queue
         self.terminal = None
 
     @window_check
@@ -84,12 +86,16 @@ class Connection(ConnectionBase):
 
     def handle_event(self, event):
         if not super().handle_event(event):
+            self.action_queue.put(actions.Quit())
             return False
 
         if isinstance(event, xproto.ExposeEvent):
             self.draw_terminal()
 
         if isinstance(event, xproto.KeyPressEvent):
-            Logger.debug('%r pressed', super().keycode_to_str(event.detail))
+            keyboard_input = super().keycode_to_str(event.detail)
+
+            if keyboard_input is not None:
+                self.action_queue.put(actions.KeyboardInput(keyboard_input))
 
         return True

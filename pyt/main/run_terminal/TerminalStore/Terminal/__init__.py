@@ -250,5 +250,7 @@ class Terminal(TerminalActions):
             return self.copy().put_code_point(action.code_point)
         elif isinstance(action, actions.PutString):
             return self.copy().put_string(action.string)
+        elif isinstance(action, actions.KeyboardInput):
+            return self.copy().put_string(action.keyboard_input)
 
         return self

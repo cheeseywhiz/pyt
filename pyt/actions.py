@@ -1,24 +1,39 @@
 import dataclasses
 import typing
 
-__all__ = 'PutByte', 'PutByteSequence', 'PutCodePoint', 'PutString'
+__all__ = (
+    'PutByte', 'PutByteSequence', 'PutCodePoint', 'PutString', 'KeyboardInput',
+    'Quit',
+)
+
+action = dataclasses.dataclass(frozen=True)
 
 
-@dataclasses.dataclass(frozen=True)
+@action
 class PutByte:
     byte: int
 
 
-@dataclasses.dataclass(frozen=True)
+@action
 class PutByteSequence:
     byte_sequence: typing.List[int]
 
 
-@dataclasses.dataclass(frozen=True)
+@action
 class PutCodePoint:
     code_point: int
 
 
-@dataclasses.dataclass(frozen=True)
+@action
 class PutString:
     string: str
+
+
+@action
+class KeyboardInput:
+    keyboard_input: str
+
+
+@action
+class Quit:
+    pass
