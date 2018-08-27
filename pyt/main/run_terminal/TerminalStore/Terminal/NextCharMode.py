@@ -1,6 +1,6 @@
 import enum
 
-__all__ = 'NextCharMode',
+__all__ = 'NextCharMode'
 
 
 class StrEnum(enum.Enum):

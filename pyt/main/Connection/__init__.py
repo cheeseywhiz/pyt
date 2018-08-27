@@ -1,12 +1,11 @@
 import queue
 import sys
 from xcffib import xproto
-from .ConnectionBase import ConnectionBase
-from . import config
+from ... import config
+from .ConnectionBase import ConnectionBase, window_check
 from .redraw_window import redraw_window
-from .ConnectionBase import window_check
 
-__all__ = 'Connection',
+__all__ = 'Connection'
 
 
 class Connection(ConnectionBase):

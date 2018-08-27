@@ -4,7 +4,7 @@ import os
 import sys
 from .make_process import make_process
 
-__all__ = 'Logger',
+__all__ = 'Logger'
 
 
 class QueueLogHandler(logging.Handler):

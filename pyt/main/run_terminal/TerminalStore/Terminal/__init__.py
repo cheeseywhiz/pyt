@@ -1,12 +1,12 @@
-from . import actions
-from . import config
-from . import control_codes
-from .Logger import Logger
+from ..... import actions
+from ..... import config
+from .....Logger import Logger
+from .. import control_codes
+from ..ParsedCSI import ParsedCSI
 from .TerminalActions import TerminalActions
-from .ParsedCSI import ParsedCSI
 from .NextCharMode import NextCharMode
 
-__all__ = 'Terminal',
+__all__ = 'Terminal'
 
 
 def empty_matrix(rows, columns, obj=None):

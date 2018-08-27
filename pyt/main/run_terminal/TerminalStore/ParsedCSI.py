@@ -2,6 +2,8 @@ import dataclasses
 import typing
 from . import control_codes
 
+__all__ = 'ParsedCSI'
+
 
 @dataclasses.dataclass
 class ParsedCSIBase:

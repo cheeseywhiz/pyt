@@ -1,12 +1,12 @@
 import dataclasses
 import typing
-from . import config
-from . import control_codes
+from ....... import config
+from .... import control_codes
+from ...NextCharMode import NextCharMode
 from .UnicodeBuffer import UnicodeBuffer
-from .NextCharMode import NextCharMode
 from .Tabs import Tabs
 
-__all__ = 'TerminalBase',
+__all__ = 'TerminalBase'
 
 
 @dataclasses.dataclass(frozen=True)

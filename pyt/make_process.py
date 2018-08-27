@@ -1,7 +1,7 @@
 import functools
 import multiprocessing
 
-__all__ = 'make_process',
+__all__ = 'make_process'
 
 
 def get_decorator(process_kwargs):

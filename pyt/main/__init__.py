@@ -1,9 +1,9 @@
 import multiprocessing
-from .Logger import Logger
+from ..Logger import Logger
 from .Connection import Connection
 from .run_terminal import run_terminal
 
-__all__ = 'main',
+__all__ = 'main'
 
 
 def main():

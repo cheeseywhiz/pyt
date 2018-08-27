@@ -2,8 +2,10 @@ import dataclasses
 import functools
 import xcffib
 from xcffib import xproto
-import pyt.config
+from .... import config
 from .ConnectionHandler import ConnectionHandler
+
+__all__ = 'ConnectionBase'
 
 
 def window_check(method):

@@ -1,8 +1,8 @@
 import redux
-from .Logger import Logger
+from ....Logger import Logger
 from .Terminal import Terminal
 
-__all__ = 'TerminalStore',
+__all__ = 'TerminalStore'
 
 
 class TerminalStore(redux.Store):

@@ -1,7 +1,7 @@
 import collections.abc
-import pyt
+from ....... import config
 
-__all__ = 'Tabs',
+__all__ = 'Tabs'
 
 
 class MutableSet(collections.abc.MutableSet):
@@ -37,10 +37,10 @@ class Tabs(MutableSet):
     @classmethod
     def from_config(cls, *, width=None, tab_width=None):
         if width is None:
-            width = pyt.config.width
+            width = config.width
 
         if tab_width is None:
-            tab_width = pyt.config.tab_width
+            tab_width = config.tab_width
 
         return cls(range(0, width, tab_width))
 

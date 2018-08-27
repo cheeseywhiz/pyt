@@ -1,8 +1,8 @@
 import math
-from . import config
+from ...... import config
 from .TerminalBase import TerminalBase
 
-__all__ = 'TerminalActions',
+__all__ = 'TerminalActions'
 
 
 class TerminalActions(TerminalBase):

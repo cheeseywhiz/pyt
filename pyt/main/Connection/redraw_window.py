@@ -1,8 +1,8 @@
-from .Logger import Logger
+from ...Logger import Logger
+from ...make_process import make_process
 from .ConnectionBase import ConnectionBase
-from .make_process import make_process
 
-__all__ = 'redraw_window',
+__all__ = 'redraw_window'
 
 
 class RedrawWindowConnection(ConnectionBase):

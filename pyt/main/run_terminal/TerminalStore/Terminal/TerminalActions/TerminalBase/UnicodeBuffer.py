@@ -1,7 +1,7 @@
 import dataclasses
 import typing
 
-__all__ = 'UnicodeBuffer',
+__all__ = 'UnicodeBuffer'
 
 
 def get_n_bytes(first):

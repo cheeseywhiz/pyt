@@ -1,8 +1,8 @@
 import xcffib
 from xcffib import xproto
-from .Logger import Logger
+from ....Logger import Logger
 
-__all__ = 'ConnectionHandler',
+__all__ = 'ConnectionHandler'
 
 
 class ConnectionHandler(xcffib.Connection):
