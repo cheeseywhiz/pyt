@@ -30,14 +30,16 @@ def print_messages(message_queue):
 
 
 def instantiate(cls):
-    message_queue = multiprocessing.Queue()
-    print_messages(message_queue)
-    return cls(message_queue)
+    return cls()
 
 
 @instantiate
 class Logger(logging.Logger):
-    def __init__(self, message_queue):
+    def __init__(self):
         super().__init__('pyt')
-        handler = QueueLogHandler(message_queue)
+        self.message_queue = multiprocessing.Queue()
+        handler = QueueLogHandler(self.message_queue)
         super().addHandler(handler)
+
+    def start(self):
+        print_messages(self.message_queue)

@@ -7,6 +7,7 @@ __all__ = 'main'
 
 
 def main():
+    Logger.start()
     Logger.debug('GUI')
     terminal_queue = multiprocessing.Queue()
     action_queue = multiprocessing.Queue()
