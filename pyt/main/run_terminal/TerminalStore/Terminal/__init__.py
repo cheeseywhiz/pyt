@@ -229,18 +229,6 @@ class Terminal(TerminalActions):
 
         return self_chain
 
-    @property
-    def screen_str(self):
-        width = config.width
-        height = config.height
-        screen = empty_matrix(height, width, ord(' '))
-
-        for cursor, code_point in self.screen.items():
-            if 0 <= cursor.x < width and 0 <= cursor.y < height:
-                screen[cursor.y][cursor.x] = code_point
-
-        return '\n'.join(''.join(map(chr, row)) for row in screen)
-
     def reduce(self, action=None):
         if isinstance(action, actions.PutByte):
             return self.copy().put_byte(action.byte)

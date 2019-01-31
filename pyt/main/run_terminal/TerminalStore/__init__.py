@@ -19,7 +19,6 @@ class TerminalStore(redux.Store):
 
     def log_state(self):
         Logger.debug(self.state)
-        Logger.debug(self.state.screen_str)
 
     def sub_queue_state(self):
         self._unsub_queue_state = super().subscribe(self.queue_state)

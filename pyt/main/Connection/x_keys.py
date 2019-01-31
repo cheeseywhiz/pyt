@@ -1,5 +1,6 @@
 import enum
 import numpy as np
+from ..run_terminal.TerminalStore import control_codes
 
 __all__ = 'Mod', 'sym_table',
 
@@ -28,6 +29,18 @@ class Mod(UIntFlagEnum):
 Mod.lock_mods = Mod.Lock, Mod.Mod2  # Caps/Num lock
 
 
+def escape_sequence(seq):
+    return chr(control_codes.C0.ESC) + seq
+
+
+def control_sequence(final_byte, *args, intermediate_byte=''):
+    return ''.join([
+        chr(control_codes.C1_7B.CSI),
+        ';'.join(map(str, args)),
+        ''.join(map(chr, [intermediate_byte, final_byte])),
+    ])
+
+
 # Adatpted from /usr/include/X11/keysymdef.h
 #
 # The "X11 Window System Protocol" standard defines in Appendix A the
@@ -44,9 +57,9 @@ Mod.lock_mods = Mod.Lock, Mod.Mod2  # Caps/Num lock
 sym_table = {
     0x000000: '',  # NoSymbol
     0xffffff: '',  # VoidSymbol
-    0xff08: '',  # BackSpace
-    0xff09: '',  # Tab
-    0xff0a: '',  # Linefeed
+    0xff08: chr(control_codes.C0.BS),  # BackSpace
+    0xff09: '\t',  # Tab
+    0xff0a: '\n',  # Linefeed
     0xff0b: '',  # Clear
     0xff0d: '\n',  # Return, enter
     0xff13: '',  # Pause
@@ -63,7 +76,7 @@ sym_table = {
     0xff3e: '',  # PreviousCandidate
 
     # Cursor control & motion
-    0xff50: '',  # Home
+    0xff50: '\r',  # Home
     0xff51: '',  # Left, left arrow
     0xff52: '',  # Up, up arrow
     0xff53: '',  # Right, right arrow
@@ -216,70 +229,70 @@ sym_table = {
     # (ISO/IEC 8859-Unicode: '',  # 1 U+0020..U+00FF)
     # Byte 0: '',  # 3
     0x0020: ' ',  # space  # U+0020 SPACE
-    0x0021: '',  # exclam  # U+0021 EXCLAMATION MARK
-    0x0022: '',  # quotedbl  # U+0022 QUOTATION MARK
-    0x0023: '',  # numbersign  # U+0023 NUMBER SIGN
-    0x0024: '',  # dollar  # U+0024 DOLLAR SIGN
-    0x0025: '',  # percent  # U+0025 PERCENT SIGN
-    0x0026: '',  # ampersand  # U+0026 AMPERSAND
-    0x0027: '',  # apostrophe  # U+0027 APOSTROPHE
-    0x0028: '',  # parenleft  # U+0028 LEFT PARENTHESIS
-    0x0029: '',  # parenright  # U+0029 RIGHT PARENTHESIS
-    0x002a: '',  # asterisk  # U+002A ASTERISK
-    0x002b: '',  # plus  # U+002B PLUS SIGN
-    0x002c: '',  # comma  # U+002C COMMA
-    0x002d: '',  # minus  # U+002D HYPHEN-MINUS
-    0x002e: '',  # period  # U+002E FULL STOP
-    0x002f: '',  # slash  # U+002F SOLIDUS
-    0x0030: '',  # XK_0  # U+0030 DIGIT ZERO
-    0x0031: '',  # XK_1  # U+0031 DIGIT ONE
-    0x0032: '',  # XK_2  # U+0032 DIGIT TWO
-    0x0033: '',  # XK_3  # U+0033 DIGIT THREE
-    0x0034: '',  # XK_4  # U+0034 DIGIT FOUR
-    0x0035: '',  # XK_5  # U+0035 DIGIT FIVE
-    0x0036: '',  # XK_6  # U+0036 DIGIT SIX
-    0x0037: '',  # XK_7  # U+0037 DIGIT SEVEN
-    0x0038: '',  # XK_8  # U+0038 DIGIT EIGHT
-    0x0039: '',  # XK_9  # U+0039 DIGIT NINE
-    0x003a: '',  # colon  # U+003A COLON
-    0x003b: '',  # semicolon  # U+003B SEMICOLON
-    0x003c: '',  # less  # U+003C LESS-THAN SIGN
-    0x003d: '',  # equal  # U+003D EQUALS SIGN
-    0x003e: '',  # greater  # U+003E GREATER-THAN SIGN
-    0x003f: '',  # question  # U+003F QUESTION MARK
-    0x0040: '',  # at  # U+0040 COMMERCIAL AT
-    0x0041: '',  # A  # U+0041 LATIN CAPITAL LETTER A
-    0x0042: '',  # B  # U+0042 LATIN CAPITAL LETTER B
-    0x0043: '',  # C  # U+0043 LATIN CAPITAL LETTER C
-    0x0044: '',  # D  # U+0044 LATIN CAPITAL LETTER D
-    0x0045: '',  # E  # U+0045 LATIN CAPITAL LETTER E
-    0x0046: '',  # F  # U+0046 LATIN CAPITAL LETTER F
-    0x0047: '',  # G  # U+0047 LATIN CAPITAL LETTER G
-    0x0048: '',  # H  # U+0048 LATIN CAPITAL LETTER H
-    0x0049: '',  # I  # U+0049 LATIN CAPITAL LETTER I
-    0x004a: '',  # J  # U+004A LATIN CAPITAL LETTER J
-    0x004b: '',  # K  # U+004B LATIN CAPITAL LETTER K
-    0x004c: '',  # L  # U+004C LATIN CAPITAL LETTER L
-    0x004d: '',  # M  # U+004D LATIN CAPITAL LETTER M
-    0x004e: '',  # N  # U+004E LATIN CAPITAL LETTER N
-    0x004f: '',  # O  # U+004F LATIN CAPITAL LETTER O
-    0x0050: '',  # P  # U+0050 LATIN CAPITAL LETTER P
-    0x0051: '',  # Q  # U+0051 LATIN CAPITAL LETTER Q
-    0x0052: '',  # R  # U+0052 LATIN CAPITAL LETTER R
-    0x0053: '',  # S  # U+0053 LATIN CAPITAL LETTER S
-    0x0054: '',  # T  # U+0054 LATIN CAPITAL LETTER T
-    0x0055: '',  # U  # U+0055 LATIN CAPITAL LETTER U
-    0x0056: '',  # V  # U+0056 LATIN CAPITAL LETTER V
-    0x0057: '',  # W  # U+0057 LATIN CAPITAL LETTER W
-    0x0058: '',  # X  # U+0058 LATIN CAPITAL LETTER X
-    0x0059: '',  # Y  # U+0059 LATIN CAPITAL LETTER Y
-    0x005a: '',  # Z  # U+005A LATIN CAPITAL LETTER Z
-    0x005b: '',  # bracketleft  # U+005B LEFT SQUARE BRACKET
-    0x005c: '',  # backslash  # U+005C REVERSE SOLIDUS
-    0x005d: '',  # bracketright  # U+005D RIGHT SQUARE BRACKET
-    0x005e: '',  # asciicircum  # U+005E CIRCUMFLEX ACCENT
-    0x005f: '',  # underscore  # U+005F LOW LINE
-    0x0060: '',  # grave  # U+0060 GRAVE ACCENT
+    0x0021: '!',  # exclam  # U+0021 EXCLAMATION MARK
+    0x0022: '"',  # quotedbl  # U+0022 QUOTATION MARK
+    0x0023: '#',  # numbersign  # U+0023 NUMBER SIGN
+    0x0024: '$',  # dollar  # U+0024 DOLLAR SIGN
+    0x0025: '%',  # percent  # U+0025 PERCENT SIGN
+    0x0026: '&',  # ampersand  # U+0026 AMPERSAND
+    0x0027: '\'',  # apostrophe  # U+0027 APOSTROPHE
+    0x0028: '(',  # parenleft  # U+0028 LEFT PARENTHESIS
+    0x0029: ')',  # parenright  # U+0029 RIGHT PARENTHESIS
+    0x002a: '*',  # asterisk  # U+002A ASTERISK
+    0x002b: '+',  # plus  # U+002B PLUS SIGN
+    0x002c: ',',  # comma  # U+002C COMMA
+    0x002d: '-',  # minus  # U+002D HYPHEN-MINUS
+    0x002e: '.',  # period  # U+002E FULL STOP
+    0x002f: '/',  # slash  # U+002F SOLIDUS
+    0x0030: '0',  # XK_0  # U+0030 DIGIT ZERO
+    0x0031: '1',  # XK_1  # U+0031 DIGIT ONE
+    0x0032: '2',  # XK_2  # U+0032 DIGIT TWO
+    0x0033: '3',  # XK_3  # U+0033 DIGIT THREE
+    0x0034: '4',  # XK_4  # U+0034 DIGIT FOUR
+    0x0035: '5',  # XK_5  # U+0035 DIGIT FIVE
+    0x0036: '6',  # XK_6  # U+0036 DIGIT SIX
+    0x0037: '7',  # XK_7  # U+0037 DIGIT SEVEN
+    0x0038: '8',  # XK_8  # U+0038 DIGIT EIGHT
+    0x0039: '9',  # XK_9  # U+0039 DIGIT NINE
+    0x003a: ':',  # colon  # U+003A COLON
+    0x003b: ';',  # semicolon  # U+003B SEMICOLON
+    0x003c: '<',  # less  # U+003C LESS-THAN SIGN
+    0x003d: '=',  # equal  # U+003D EQUALS SIGN
+    0x003e: '>',  # greater  # U+003E GREATER-THAN SIGN
+    0x003f: '?',  # question  # U+003F QUESTION MARK
+    0x0040: '@',  # at  # U+0040 COMMERCIAL AT
+    0x0041: 'A',  # A  # U+0041 LATIN CAPITAL LETTER A
+    0x0042: 'B',  # B  # U+0042 LATIN CAPITAL LETTER B
+    0x0043: 'C',  # C  # U+0043 LATIN CAPITAL LETTER C
+    0x0044: 'D',  # D  # U+0044 LATIN CAPITAL LETTER D
+    0x0045: 'E',  # E  # U+0045 LATIN CAPITAL LETTER E
+    0x0046: 'F',  # F  # U+0046 LATIN CAPITAL LETTER F
+    0x0047: 'G',  # G  # U+0047 LATIN CAPITAL LETTER G
+    0x0048: 'H',  # H  # U+0048 LATIN CAPITAL LETTER H
+    0x0049: 'I',  # I  # U+0049 LATIN CAPITAL LETTER I
+    0x004a: 'J',  # J  # U+004A LATIN CAPITAL LETTER J
+    0x004b: 'K',  # K  # U+004B LATIN CAPITAL LETTER K
+    0x004c: 'L',  # L  # U+004C LATIN CAPITAL LETTER L
+    0x004d: 'M',  # M  # U+004D LATIN CAPITAL LETTER M
+    0x004e: 'N',  # N  # U+004E LATIN CAPITAL LETTER N
+    0x004f: 'O',  # O  # U+004F LATIN CAPITAL LETTER O
+    0x0050: 'P',  # P  # U+0050 LATIN CAPITAL LETTER P
+    0x0051: 'Q',  # Q  # U+0051 LATIN CAPITAL LETTER Q
+    0x0052: 'R',  # R  # U+0052 LATIN CAPITAL LETTER R
+    0x0053: 'S',  # S  # U+0053 LATIN CAPITAL LETTER S
+    0x0054: 'T',  # T  # U+0054 LATIN CAPITAL LETTER T
+    0x0055: 'U',  # U  # U+0055 LATIN CAPITAL LETTER U
+    0x0056: 'V',  # V  # U+0056 LATIN CAPITAL LETTER V
+    0x0057: 'W',  # W  # U+0057 LATIN CAPITAL LETTER W
+    0x0058: 'X',  # X  # U+0058 LATIN CAPITAL LETTER X
+    0x0059: 'Y',  # Y  # U+0059 LATIN CAPITAL LETTER Y
+    0x005a: 'Z',  # Z  # U+005A LATIN CAPITAL LETTER Z
+    0x005b: '[',  # bracketleft  # U+005B LEFT SQUARE BRACKET
+    0x005c: '\\',  # backslash  # U+005C REVERSE SOLIDUS
+    0x005d: ']',  # bracketright  # U+005D RIGHT SQUARE BRACKET
+    0x005e: '^',  # asciicircum  # U+005E CIRCUMFLEX ACCENT
+    0x005f: '_',  # underscore  # U+005F LOW LINE
+    0x0060: '`',  # grave  # U+0060 GRAVE ACCENT
     0x0061: 'a',  # a  # U+0061 LATIN SMALL LETTER A
     0x0062: 'b',  # b  # U+0062 LATIN SMALL LETTER B
     0x0063: 'c',  # c  # U+0063 LATIN SMALL LETTER C
@@ -306,8 +319,8 @@ sym_table = {
     0x0078: 'x',  # x  # U+0078 LATIN SMALL LETTER X
     0x0079: 'y',  # y  # U+0079 LATIN SMALL LETTER Y
     0x007a: 'z',  # z  # U+007A LATIN SMALL LETTER Z
-    0x007b: '',  # braceleft  # U+007B LEFT CURLY BRACKET
-    0x007c: '',  # bar  # U+007C VERTICAL LINE
-    0x007d: '',  # braceright  # U+007D RIGHT CURLY BRACKET
-    0x007e: '',  # asciitilde  # U+007E TILDE
+    0x007b: '{',  # braceleft  # U+007B LEFT CURLY BRACKET
+    0x007c: '|',  # bar  # U+007C VERTICAL LINE
+    0x007d: '}',  # braceright  # U+007D RIGHT CURLY BRACKET
+    0x007e: '~',  # asciitilde  # U+007E TILDE
 }

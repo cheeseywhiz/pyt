@@ -9,7 +9,7 @@ __all__ = 'Logger'
 
 class QueueLogHandler(logging.Handler):
     def __init__(self, message_queue):
-        super().__init__(logging.NOTSET)
+        super().__init__(logging.INFO)
         fmt = logging.Formatter('%(name)s: %(process)d: %(levelname)s: '
                                 '%(message)s')
         super().setFormatter(fmt)
